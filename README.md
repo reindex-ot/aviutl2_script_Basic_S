@@ -25,7 +25,7 @@
 
 ##  詳しい解説について
 
-[Wiki](https://github.com/sigma-axis/aviutl2_script_Basic_S/Wiki) に順次掲載していく予定です．
+[Wiki](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki) に順次掲載していく予定です．
 
 パラメタインジェクション (`PI`) 経由でのみ指定・調整できる項目もあります．
 
