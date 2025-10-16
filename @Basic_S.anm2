@@ -1,0 +1,2942 @@
+--[[
+MIT License
+Copyright (c) 2025 sigma-axis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+https://mit-license.org/
+]]
+@四隅丸め
+--information:四隅丸め@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\クリッピング
+--track@radius:半径,0,2000,40,0.01
+--check@uniform:半径均一,1
+--track@r_RT:右上半径,0,2000,40,0.01
+--track@r_RB:右下半径,0,2000,40,0.01
+--track@r_LB:左下半径,0,2000,40,0.01
+--track@aspect:縦横比,-100,100,0,0.001
+--check@fixed_aspect:縦横比固定,1
+--select@shape:形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--track@line:ライン幅,0,4000,4000,0.01
+--value@PI:PI,{}
+--[[pixelshader@carve:
+cbuffer constant0 : register(b0) {
+	float3 size_shape[4];
+	float2 size;
+	float line_width;
+};
+
+float shape_circle(float2 pt, float2 sz, float pad)
+{
+	const float2 p0 = max(pt, 0),
+		sz0 = sz - pad, r = (sz0 * sz0).yx;
+	if (any(sz0 <= 0)) return -1;
+	const float v = dot(p0 * p0, r) - r.x * r.y,
+		d = 2 * length(p0 * r); // |grad(v)|
+	return d > 0 ? v / d : sign(v);
+}
+float2 shape_rhombus(float2 pt, float2 sz, float pad)
+{
+	static const float3 L = { 1, 1, -1 }; // 45deg-line.
+	const float3 pt1 = { pt, 1 }, sza = { sz, sz.x * sz.y };
+	const float v = dot(pt1, sza.yxz * L) / length(sza.yx * L.xy);
+	return v + float2(0, pad);
+}
+float2 shape_octagon_S(float2 pt, float2 sz, float pad)
+{
+	static const float3 L = { 0.9238795, 0.38268343, -0.9238795 };
+	const float3 pt1 = { pt, 1 }, sza = { sz, sz.x * sz.y };
+	const float v = max(
+		dot(pt1, sza.yxz * L) / length(sza.yx * L.xy),
+		dot(pt1.yxz, sza * L) / length(sza.xy * L.xy));
+	return v + float2(0, pad);
+}
+float2 shape_octagon_R(float2 pt, float2 sz, float pad)
+{
+	static const float3 L0 = { 1, 0, -1 },
+		L1 = { 0.70710677, 0.70710677, -1 }; // 45deg-line.
+	const float3 pt1 = { pt, 1 }, sza = { sz, sz.x * sz.y };
+	const float v = max(max(
+		dot(pt1, sza.yxz * L0) / length(sza.yx * L0.xy),
+		dot(pt1.yxz, sza * L0) / length(sza.xy * L0.xy)),
+		dot(pt1, sza.yxz * L1) / length(sza.yx * L1.xy));
+	return v + float2(0, pad);
+}
+float2 shape_dodecagon_S(float2 pt, float2 sz, float pad)
+{
+	static const float3
+		L1 = { 0.9659258, 0.25881904, -0.9659258 }, // 15deg-line.
+		L2 = { 0.70710677, 0.70710677, -0.9659258 }; // 45deg-line.
+	const float3 pt1 = { pt, 1 }, sza = { sz, sz.x * sz.y };
+	const float v = max(max(
+		dot(pt1, sza.yxz * L1) / length(sza.yx * L1.xy),
+		dot(pt1.yxz, sza * L1) / length(sza.xy * L1.xy)),
+		dot(pt1, sza.yxz * L2) / length(sza.yx * L2.xy));
+	return v + float2(0, pad);
+}
+float2 shape_dodecagon_R(float2 pt, float2 sz, float pad)
+{
+	static const float3 L0 = { 1, 0, -1 },
+		L1 = { 0.8660254, 0.5, -1 }; // 30deg-line.
+	const float3 pt1 = { pt, 1 }, sza = { sz, sz.x * sz.y };
+	const float v = max(max(
+		dot(pt1, sza.yxz * L0) / length(sza.yx * L0.xy),
+		dot(pt1.yxz, sza * L0) / length(sza.xy * L0.xy)), max(
+		dot(pt1, sza.yxz * L1) / length(sza.yx * L1.xy),
+		dot(pt1.yxz, sza * L1) / length(sza.xy * L1.xy)));
+	return v + float2(0, pad);
+}
+float2 shape_spike(float2 pt, float2 sz, float pad)
+{
+	static const float3
+		L1 = { 0.9659258, 0.25881904, -0.9659258 }, // 15deg-line.
+		L2 = { -0.5, 0.8660254, 0 }; // 120deg-line.
+	const float3 pt1 = { pt, 1 }, sza = { sz, sz.x * sz.y };
+	const float v = max(max(
+		dot(pt1, sza.yxz * L1) / length(sza.yx * L1.xy),
+		dot(pt1.yxz, sza * L1) / length(sza.xy * L1.xy)), min(
+		dot(pt1, sza.yxz * L2) / length(sza.yx * L2.xy),
+		dot(pt1.yxz, sza * L2) / length(sza.xy * L2.xy)));
+	return v + float2(0, pad);
+}
+
+float2 carve_shape(float2 pt, float2 sz, int shape)
+{
+	[branch] if (any(sz <= 0)) return -1;
+	else {
+		[branch] switch (shape) {
+		case 0: default: return float2(
+			shape_circle(pt, sz, 0),
+			shape_circle(pt, sz, line_width));
+		case 1: return -float2(
+			shape_circle(sz - pt, sz, 0),
+			shape_circle(sz - pt, sz, -line_width));
+		case 2: return shape_rhombus(pt, sz, line_width);
+		case 3: return min(pt.x, pt.y) + float2(0, line_width);
+		case 4: return shape_octagon_S(pt, sz, line_width);
+		case 5: return -shape_octagon_R(sz - pt, sz, -line_width);
+		case 6: return -shape_octagon_S(sz - pt, sz, -line_width);
+		case 7: return shape_dodecagon_S(pt, sz, line_width);
+		case 8: return -shape_dodecagon_R(sz - pt, sz, -line_width);
+		case 9: return -shape_dodecagon_S(sz - pt, sz, -line_width);
+		case 10: return -shape_spike(sz - pt, sz, -line_width);
+		case 11: return shape_spike(pt, sz, line_width);
+		}
+	}
+}
+float4 carve(float4 pos : SV_Position) : SV_Target
+{
+	float2 outer = min(pos.xy, size - pos.xy);
+	outer = float2(-1, line_width - min(outer.x, outer.y));
+
+	static const float2 corners[4] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+	for (int c = 0; c < 4; c++) {
+		const float3 szs = size_shape[c];
+		outer = max(outer, carve_shape(
+			szs.xy - abs(pos.xy - corners[c] * size), szs.xy, int(szs.z)));
+	}
+	const float2 alpha = saturate(0.5 - outer);
+	return float4(0, 0, 0, alpha[0] * (1 - alpha[1]));
+}
+]]
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+local function apply_aspect(r, a)
+	return math.min(1 - a, 1) * r, math.min(1 + a, 1) * r;
+end
+radius = math.max(radius, 0);
+uniform = uniform ~= 0;
+aspect = math.min(math.max(aspect / 100, -1), 1);
+local radii, shapes = {
+	{ apply_aspect(radius, aspect) },
+	{ apply_aspect(uniform and radius or math.max(r_RT, 0), aspect) },
+	{ apply_aspect(uniform and radius or math.max(r_RB, 0), aspect) },
+	{ apply_aspect(uniform and radius or math.max(r_LB, 0), aspect) },
+}, { shape, shape, shape, shape };
+
+--[==[
+	PI = {
+		radii:			table|number|nil,
+		fixed_aspect:	boolean|number|nil,
+		shapes:			table|string|nil,
+		line:			number?,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+local function as_pair(c)
+	if type(c) == "number" then return c, c;
+	elseif type(c) == "table" then
+		local x, y = tonumber(c[1]), tonumber(c[2]);
+		if x and y then return x, y end
+	end
+	return nil;
+end
+if type(PI.radii) == "number" then
+	local r = PI.radii;
+	radii = { { r, r }, { r, r }, { r, r }, { r, r } };
+elseif type(PI.radii) == "table" then
+	if PI.radii.uniform then
+		local x, y = as_pair(PI.radii.uniform);
+		if x then radii = { { x, y }, { x, y }, { x, y }, { x, y } } end
+	end
+	for i = 1, 4 do
+		local x, y = as_pair(PI.radii[i]);
+		if x then radii[i] = { x, y } end
+	end
+end
+fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect ~= 0);
+if PI.shapes then
+	local name2num = {
+		["円"] = 0, ["円(凹)"] = 1, ["菱形"] = 2, ["四角形(凹)"] = 3,
+		["正8角形"] = 4, ["正8角形(凹)"] = 5, ["正8角形(凹斜)"] = 6,
+		["正12角形"] = 7, ["正12角形(凹)"] = 8, ["正12角形(凹斜)"] = 9,
+		["スパイク"] = 10, ["スパイク(凹)"] = 11,
+	};
+	if type(PI.shapes) == "string" then
+		local n = name2num[PI.shapes];
+		if n then shapes = { n, n, n, n } end
+	elseif type(PI.shapes) == "table" then
+		for i = 1, 4 do
+			if type(PI.shapes[i]) == "string" then
+				shapes[i] = name2num[PI.shapes[i]] or shapes[i];
+			end
+		end
+	end
+end
+line = tonumber(PI.line) or line;
+
+-- normalize parameters.
+for i = 1, 4 do
+	radii[i][1], radii[i][2] = math.max(radii[i][1], 0), math.max(radii[i][2], 0);
+	shapes[i] = math.min(math.max(math.floor(0.5 + shapes[i]), 0), 11);
+end
+line = math.max(line, 0);
+
+-- early return if not effective.
+if 2 * line + 1 >= math.min(obj.w, obj.h) and math.max(
+	math.min(radii[1][1], radii[1][2]),
+	math.min(radii[2][1], radii[2][2]),
+	math.min(radii[3][1], radii[3][2]),
+	math.min(radii[4][1], radii[4][2])) <= 0 then return end
+
+-- avoid corner sizes from being too large.
+do local prev = {
+		{ radii[1][1], radii[1][2] },
+		{ radii[2][1], radii[2][2] },
+		{ radii[3][1], radii[3][2] },
+		{ radii[4][1], radii[4][2] },
+	};
+	for i = 1, 4 do
+		local j, r1, r2, m = 2 - (i % 2),
+			radii[i], radii[(i % 4) + 1],
+			(i % 2) > 0 and obj.w or obj.h;
+		if r1[j] + r2[j] >= m then
+			local c1, c2 = r1[j], r2[j];
+			if c1 <= m / 2 then c2 = m - c1;
+			elseif c2 <= m / 2 then c1 = m - c2;
+			else c1, c2 = m / 2, m / 2 end
+			r1[j], r2[j] = c1, c2;
+		end
+	end
+	-- adjust aspect ratios if specified to be fixed.
+	if fixed_aspect then
+		for i = 1, 4 do
+			local r, r0 = radii[i], prev[i];
+			local u, v = r[1] * r0[2], r[2] * r0[1];
+			if u > v then r[1] = v / r0[2];
+			elseif u < v then r[2] = u / r0[1] end
+		end
+	end
+end
+
+-- apply shader.
+obj.pixelshader("carve", "object", nil, {
+	radii[1][1], radii[1][2], shapes[1], 0;
+	radii[2][1], radii[2][2], shapes[2], 0;
+	radii[3][1], radii[3][2], shapes[3], 0;
+	radii[4][1], radii[4][2], shapes[4], 0;
+	obj.w, obj.h; line;
+}, "mask");
+
+@背景角丸矩形
+--information:背景角丸矩形@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\装飾
+--track@pad_X:余白X,-1000,1000,10,1
+--track@pad_Y:余白Y,-1000,1000,10,1
+--select@clip:クリッピング=0,なし=0,あり=1,ライン内=2
+--track@line:ライン幅,-500,4000,4000,0.01
+--color@color:色,0xc0c0c0
+--file@file_image:パターン画像
+--track@alpha:透明度,0,100,0,0.01
+--color@color_back:背景色,0xc0c0c0
+--file@file_back:背景パターン画像
+--track@alpha_back:背景透明度,0,100,100,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--track@radius:角半径,0,2000,40,0.01
+--check@uniform:半径均一,1
+--track@r_RT:右上半径,0,2000,40,0.01
+--track@r_RB:右下半径,0,2000,40,0.01
+--track@r_LB:左下半径,0,2000,40,0.01
+--track@aspect:丸角縦横比,-100,100,0,0.001
+--check@fixed_aspect:丸角縦横比固定,1
+--select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--value@PI:PI,{}
+--[[pixelshader@combine:
+Texture2D obj : register(t0);
+Texture2D chm : register(t1);
+Texture2D bkg : register(t2);
+cbuffer constant0 : register(b0) {
+	float4 color_back;
+	float2 ofs_obj, ofs_bkg;
+	float a_object, a_chrome, a_back, clip_f;
+};
+float4 combine(float4 pos : SV_Position) : SV_Target
+{
+	static const int clip = int(clip_f);
+	float4
+		col_obj = obj.Load(int3(floor(pos.xy - ofs_obj), 0)),
+		col_bkg = bkg.Load(int3(floor(pos.xy - ofs_bkg), 0)),
+		col_chm = chm.Load(int3(floor(pos.xy), 0));
+
+	col_obj *= a_object;
+	const float
+		a_clip_obj = clip == 0 ? 1 : clip < 2 ? col_bkg.a : col_bkg.a - col_chm.a,
+		a_clip_bkg = (1 - col_obj.a) * (col_bkg.a - col_chm.a),
+		a_clip_chm = clip < 2 ? 1 - col_obj.a : 1;
+
+	return a_clip_obj * col_obj
+		+ a_clip_chm * a_chrome * col_chm
+		+ a_clip_bkg * a_back * color_back;
+}
+]]
+--[[pixelshader@combine_img:
+Texture2D obj : register(t0);
+Texture2D mask_chm : register(t1);
+Texture2D mask_bkg : register(t2);
+Texture2D chm : register(t3);
+Texture2D bkg : register(t4);
+cbuffer constant0 : register(b0) {
+	float2 ofs_obj, ofs_bkg, ofs_tex_chm, ofs_tex_bkg, size_tex_chm_f, size_tex_bkg_f;
+	float a_object, a_chrome, a_back, clip_f;
+};
+int2 loop_pos(int2 center, uint2 size)
+{
+	const int2 pt = center + (size >> 1);
+	return pt >= 0 ?
+		uint2(pt) % size :
+		size - 1 - int2(uint2(-1 - pt) % size);
+}
+float4 combine_img(float4 pos : SV_Position) : SV_Target
+{
+	static const int clip = int(clip_f);
+	static const uint2
+		size_tex_chm = uint2(size_tex_chm_f),
+		size_tex_bkg = uint2(size_tex_bkg_f);
+
+	const int2 pt = floor(pos.xy - ofs_bkg);
+	float4
+		col_obj = obj.Load(int3(floor(pos.xy - ofs_obj), 0)),
+		col_bkg = bkg.Load(int3(loop_pos(pt - int2(ofs_tex_bkg), size_tex_bkg), 0)),
+		col_chm = chm.Load(int3(loop_pos(pt - int2(ofs_tex_chm), size_tex_chm), 0));
+	float
+		a_bkg = mask_bkg.Load(int3(pt, 0)).a,
+		a_chm = mask_chm.Load(int3(floor(pos.xy), 0)).a;
+
+	col_obj *= a_object;
+	const float
+		a_clip_obj = clip == 0 ? 1 : clip < 2 ? a_bkg : a_bkg - a_chm,
+		a_clip_bkg = (1 - col_obj.a) * (a_bkg - a_chm),
+		a_clip_chm = clip < 2 ? 1 - col_obj.a : 1;
+
+	return a_clip_obj * col_obj
+		+ a_clip_chm * a_chrome * a_chm * col_chm
+		+ a_clip_bkg * a_back * a_bkg * col_bkg;
+}
+]]
+local obj, math, bit, tonumber, tostring, type, pairs, table, buffer = obj, math, bit, tonumber, tostring, type, pairs, table, require("string.buffer");
+
+-- take parameters.
+--[==[
+	PI = {
+		pad_X:			table|number|nil,
+		pad_Y:			table|number|nil,
+		clip:			string?,
+		line:			number?,
+		color:			number?,
+		file_image:		string?,
+		line_x:			number?,
+		line_y:			number?,
+		alpha:			number?,
+		color_back:		number?,
+		file_back:		string?,
+		back_x:			number?,
+		back_y:			number?,
+		alpha_back:		number?,
+		alpha_front:	number?,
+		radii:			table|number|nil,
+		fixed_aspect:	boolean|number|nil,
+		shapes:			table|string|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+local function as_pair(c, v)
+	if type(c) == "number" then return c, c;
+	elseif type(c) == "table" then
+		local x, y = tonumber(c[1]), tonumber(c[2]);
+		if x and y then return x, y end
+	end
+	return v, v;
+end
+local pad_L, pad_R = as_pair(PI.pad_X, pad_X);
+local pad_T, pad_B = as_pair(PI.pad_Y, pad_Y);
+if type(PI.clip) == "string" then
+	clip = ({ ["なし"] = 0, ["あり"] = 1, ["ライン内"] = 2 })[PI.clip] or clip;
+end
+line = tonumber(PI.line) or line;
+color = tonumber(PI.color) or color;
+file_image = type(PI.file_image) == "string" and PI.file_image or file_image;
+local line_x, line_y = tonumber(PI.line_x) or 0, tonumber(PI.line_y) or 0;
+alpha = tonumber(PI.alpha) or alpha;
+color_back = tonumber(PI.color_back) or color_back;
+file_back = type(PI.file_back) == "string" and PI.file_back or file_back;
+local back_x, back_y = tonumber(PI.back_x) or 0, tonumber(PI.back_y) or 0;
+alpha_back = tonumber(PI.alpha_back) or alpha_back;
+alpha_front = tonumber(PI.alpha_front) or alpha_front;
+fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect ~= 0) and 1 or 0;
+
+-- normalize parameters.
+pad_L = math.floor(0.5 + pad_L);
+pad_R = math.floor(0.5 + pad_R);
+pad_T = math.floor(0.5 + pad_T);
+pad_B = math.floor(0.5 + pad_B);
+clip = math.min(math.max(math.floor(0.5 + clip), 0), 2);
+line = math.max(line, -500);
+color = math.floor(0.5 + color) % 2 ^ 24;
+alpha = math.min(math.max(1 - alpha / 100, 0), 1);
+color_back = math.floor(0.5 + color_back) % 2 ^ 24;
+alpha_back = math.min(math.max(1 - alpha_back / 100, 0), 1);
+alpha_front = math.min(math.max(1 - alpha_front / 100, 0), 1);
+
+-- further calculations.
+if line < 0 then
+	line, pad_L, pad_R, pad_T, pad_B =
+		-line, pad_L - line, pad_R - line, pad_T - line, pad_B - line;
+end
+local w, h = obj.w, obj.h;
+local W, H = pad_L + w + pad_R, pad_T + h + pad_B;
+if (W <= 0 or H <= 0) and clip == 0 then
+	-- nothing added backside.
+	if alpha_front < 1 then
+		obj.effect("透明度適用@Basic_S", "透明度", 100 * (1 - alpha_front));
+	end
+	return;
+end
+local L, R, T, B if clip > 0 then
+	L, R, T, B = pad_L, pad_R, pad_T, pad_B;
+else
+	L, R, T, B =
+		math.max(pad_L, 0), math.max(pad_R, 0),
+		math.max(pad_T, 0), math.max(pad_B, 0);
+end
+if L + w + R <= 0 or T + h + B <= 0 then
+	-- results in empty.
+	obj.effect("クリッピング", "下", h);
+	return;
+end
+local big_radius = math.max(W, H, 4000);
+if clip ~= 2 and color == color_back and file_image == file_back and alpha == alpha_back then
+	line = big_radius;
+elseif line <= 0 then
+	line, alpha, color, file_image = big_radius, alpha_back, color_back, file_back;
+	if clip == 2 then clip = 1 end
+end
+local do_fill = 2 * line - 1 >= math.min(W, H);
+local shape_name = ({
+	"円", "円(凹)", "菱形", "四角形(凹)",
+	"正8角形", "正8角形(凹)", "正8角形(凹斜)", "正12角形", "正12角形(凹)", "正12角形(凹斜)",
+	"スパイク", "スパイク(凹)",
+})[math.floor(0.5 + shape) + 1] or "円";
+
+-- make effect.
+if clip == 0 and alpha <= 0 and (do_fill or alpha_back <= 0) then
+	-- nothing is drawn but only the canvas extends.
+	obj.effect("領域拡張", "左", L, "右", R, "上", T, "下", B);
+else
+	local cache_name, cache_back, cache_chrome =
+		"cache:basic_s/backrect/obj", "cache:basic_s/backrect/bkg", "cache:basic_s/backrect/chm";
+	local size_image_x, size_image_y, size_back_x, size_back_y, has_image, has_image_back =
+		1, 1, 1, 1, #file_image >= 4 and alpha > 0,
+		#file_back >= 4 and not do_fill and alpha_back > 0;
+
+	-- backup the current object.
+	obj.copybuffer(cache_name, "object");
+
+	-- parepare the canvas and common parameters.
+	local function full_escape_repl(s) return "\\"..s:byte() end
+	local function full_escape(s) return ("%q"):format(s):gsub("[\128-\255]", full_escape_repl) end
+	local pi_head = ("radii=require'string.buffer'.decode%s,shapes=require'string.buffer'.decode%s,line="):format(
+		full_escape(buffer.encode(PI.radii)), full_escape(buffer.encode(PI.shapes)));
+	obj.setoption("drawtarget", "tempbuffer", W, H);
+
+	-- try to loading the images if specified.
+	if has_image or has_image_back then
+		local obj_props = { obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha };
+		-- chrome image.
+		if has_image then
+			obj.load("image", file_image);
+			has_image = obj.w > 0 and obj.h > 0;
+		end
+		if not has_image then obj.load("figure", "四角形", color, 1) end
+		size_image_x, size_image_y = obj.w, obj.h;
+		obj.copybuffer(cache_chrome, "object");
+
+		-- background image.
+		if has_image_back and file_back == file_image then
+			-- reuse the one that is already loaded.
+			cache_back, has_image_back, size_back_x, size_back_y =
+				cache_chrome, has_image, size_image_x, size_image_y;
+		else
+			if has_image_back then
+				obj.load("image", file_back);
+				has_image_back = obj.w > 0 and obj.h > 0;
+			end
+			if not has_image_back then obj.load("figure", "四角形", color_back, 1) end
+			size_back_x, size_back_y = obj.w, obj.h;
+			obj.copybuffer(cache_back, "object");
+		end
+
+		obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha = unpack(obj_props);
+	end
+
+	-- render the background first.
+	obj.copybuffer("object", "tempbuffer");
+	if do_fill or clip > 0 or alpha_back > 0 then
+		obj.clearbuffer("object", color);
+		obj.effect("四隅丸め@Basic_S", "半径", radius,
+			"半径均一", uniform, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
+			"縦横比", aspect, "縦横比固定", fixed_aspect, "形状", shape_name, "PI",
+			pi_head..math.max(W, H, 4000));
+		obj.copybuffer("tempbuffer", "object");
+	end
+
+	-- next the chrome part.
+	if not do_fill then
+		obj.clearbuffer("object", color);
+		obj.effect("四隅丸め@Basic_S", "半径", radius,
+			"半径均一", uniform, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
+			"縦横比", aspect, "縦横比固定", fixed_aspect, "形状", shape_name, "PI",
+			pi_head..line);
+	end
+
+	-- combine them by shader.
+	obj.effect("領域拡張", "左", L - pad_L, "右", R - pad_R, "上", T - pad_T, "下", B - pad_B);
+	if has_image or has_image_back then
+		obj.pixelshader("combine_img", "object",
+			{ cache_name, "object", "tempbuffer", cache_chrome, cache_back }, {
+			L, T; L - pad_L, T - pad_T;
+			math.floor(W / 2) + line_x, math.floor(H / 2) + line_y;
+			math.floor(W / 2) + back_x, math.floor(H / 2) + back_y;
+			size_image_x, size_image_y; size_back_x, size_back_y;
+			alpha_front; alpha; alpha_back;
+			clip;
+		});
+	else
+		obj.pixelshader("combine", "object", { cache_name, "object", "tempbuffer" }, {
+			bit.band(color_back, 0xff0000) / 0xff0000,
+			bit.band(color_back, 0x00ff00) / 0x00ff00,
+			bit.band(color_back, 0x0000ff) / 0x0000ff, 1;
+			L, T; L - pad_L, T - pad_T;
+			alpha_front; alpha; alpha_back;
+			clip;
+		});
+	end
+end
+
+-- adjust the center.
+obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
+
+@背景楕円
+--information:背景楕円@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\装飾
+--track@pad_X:余白X,-1000,1000,10,1
+--track@pad_Y:余白Y,-1000,1000,10,1
+--select@clip:クリッピング=0,なし=0,あり=1,ライン内=2
+--track@line:ライン幅,-500,4000,4000,0.01
+--color@color:色,0xc0c0c0
+--file@file_image:パターン画像
+--track@alpha:透明度,0,100,0,0.01
+--color@color_back:背景色,0xc0c0c0
+--file@file_back:背景パターン画像
+--track@alpha_back:背景透明度,0,100,100,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--check@inclusive:包含,1
+--check@circle:真円,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+--[==[
+	PI = {
+		pad_X:			number?,
+		pad_Y:			number?,
+		clip:			string?,
+		line:			number?,
+		color:			number?,
+		file_image:		string?,
+		line_x:			number?,
+		line_y:			number?,
+		alpha:			number?,
+		color_back:		number?,
+		file_back:		string?,
+		back_x:			number?,
+		back_y:			number?,
+		alpha_back:		number?,
+		alpha_front:	number?,
+		inclusive:		boolean|number|nil,
+		circle:			boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+local function as_pair(c, v)
+	if type(c) == "number" then return c, c;
+	elseif type(c) == "table" then
+		local x, y = tonumber(c[1]), tonumber(c[2]);
+		if x and y then return x, y end
+	end
+	return v, v;
+end
+local pad_L, pad_R = as_pair(PI.pad_X, pad_X);
+local pad_T, pad_B = as_pair(PI.pad_Y, pad_Y);
+clip = math.min(math.max(math.floor(0.5 + clip), 0), 2);
+if type(PI.clip) == "string" then
+	clip = ({ ["なし"] = 0, ["あり"] = 1, ["ライン内"] = 2 })[PI.clip] or clip;
+end
+line = tonumber(PI.line) or line;
+color = tonumber(PI.color) or color;
+file_image = type(PI.file_image) == "string" and PI.file_image or file_image;
+local line_x, line_y = tonumber(PI.line_x) or 0, tonumber(PI.line_y) or 0;
+alpha = tonumber(PI.alpha) or alpha;
+color_back = tonumber(PI.color_back) or color_back;
+file_back = type(PI.file_back) == "string" and PI.file_back or file_back;
+local back_x, back_y = tonumber(PI.back_x) or 0, tonumber(PI.back_y) or 0;
+alpha_back = tonumber(PI.alpha_back) or alpha_back;
+alpha_front = tonumber(PI.alpha_front) or alpha_front;
+inclusive = as_bool(PI.inclusive, inclusive ~= 0);
+circle = as_bool(PI.circle, circle ~= 0);
+
+-- normalize parameters.
+pad_L = math.floor(0.5 + pad_L);
+pad_R = math.floor(0.5 + pad_R);
+pad_T = math.floor(0.5 + pad_T);
+pad_B = math.floor(0.5 + pad_B);
+clip = ({ [0] = "なし",  "あり",  "ライン内" })[clip] or "なし";
+
+-- further calculations.
+local dx, dy = 0, 0 do
+	local W, H = pad_L + obj.w + pad_R, pad_T + obj.h + pad_B;
+	if inclusive then
+		if circle then
+			local radius = (W ^ 2 + H ^ 2) ^ 0.5 / 2;
+			dx, dy = math.ceil(radius - W / 2), math.ceil(radius - H / 2);
+		else
+			local t = (2 ^ 0.5 - 1) / 2;
+			dx, dy = math.ceil(t * W), math.ceil(t * H);
+		end
+	elseif circle then
+		if W < H then dx = math.ceil((H - W) / 2);
+		else dy = math.ceil((W - H) / 2) end
+	end
+end
+pad_L, pad_R = dx + pad_L, dx + pad_R;
+pad_T, pad_B = dy + pad_T, dy + pad_B;
+local big_radius = math.max(4000,
+	math.max(pad_L, 0) + obj.w + math.max(pad_R, 0),
+	math.max(pad_T, 0) + obj.h + math.max(pad_B, 0));
+
+-- apply effect.
+obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
+	"ライン幅", line, "色", color, "パターン画像", file_image, "透明度", alpha,
+	"背景色", color_back, "背景パターン画像", file_back, "背景透明度", alpha_back,
+	"前景透明度", alpha_front,
+	"角半径", big_radius, "丸角形状", "円", "丸角縦横比固定", 0,
+	"PI", ("pad_X={%d,%d},pad_Y={%d,%d},line_x=%s,line_y=%s,back_x=%s,back_y=%s"):format(
+		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
+
+@背景菱形
+--information:背景菱形@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\装飾
+--track@pad_X:余白X,-1000,1000,10,1
+--track@pad_Y:余白Y,-1000,1000,10,1
+--select@clip:クリッピング=0,なし=0,あり=1,ライン内=2
+--track@line:ライン幅,-500,4000,4000,0.01
+--color@color:色,0xc0c0c0
+--file@file_image:パターン画像
+--track@alpha:透明度,0,100,0,0.01
+--color@color_back:背景色,0xc0c0c0
+--file@file_back:背景パターン画像
+--track@alpha_back:背景透明度,0,100,100,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--check@inclusive:包含,1
+--check@square:正方形,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+--[==[
+	PI = {
+		pad_X:			number?,
+		pad_Y:			number?,
+		clip:			string?,
+		line:			number?,
+		color:			number?,
+		file_image:		string?,
+		line_x:			number?,
+		line_y:			number?,
+		alpha:			number?,
+		color_back:		number?,
+		file_back:		string?,
+		back_x:			number?,
+		back_y:			number?,
+		alpha_back:		number?,
+		alpha_front:	number?,
+		inclusive:		boolean|number|nil,
+		square:			boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+local function as_pair(c, v)
+	if type(c) == "number" then return c, c;
+	elseif type(c) == "table" then
+		local x, y = tonumber(c[1]), tonumber(c[2]);
+		if x and y then return x, y end
+	end
+	return v, v;
+end
+local pad_L, pad_R = as_pair(PI.pad_X, pad_X);
+local pad_T, pad_B = as_pair(PI.pad_Y, pad_Y);
+clip = math.min(math.max(math.floor(0.5 + clip), 0), 2);
+if type(PI.clip) == "string" then
+	clip = ({ ["なし"] = 0, ["あり"] = 1, ["ライン内"] = 2 })[PI.clip] or clip;
+end
+line = tonumber(PI.line) or line;
+color = tonumber(PI.color) or color;
+file_image = type(PI.file_image) == "string" and PI.file_image or file_image;
+local line_x, line_y = tonumber(PI.line_x) or 0, tonumber(PI.line_y) or 0;
+alpha = tonumber(PI.alpha) or alpha;
+color_back = tonumber(PI.color_back) or color_back;
+file_back = type(PI.file_back) == "string" and PI.file_back or file_back;
+local back_x, back_y = tonumber(PI.back_x) or 0, tonumber(PI.back_y) or 0;
+alpha_back = tonumber(PI.alpha_back) or alpha_back;
+alpha_front = tonumber(PI.alpha_front) or alpha_front;
+inclusive = as_bool(PI.inclusive, inclusive ~= 0);
+square = as_bool(PI.square, square ~= 0);
+
+-- normalize parameters.
+pad_L = math.floor(0.5 + pad_L);
+pad_R = math.floor(0.5 + pad_R);
+pad_T = math.floor(0.5 + pad_T);
+pad_B = math.floor(0.5 + pad_B);
+clip = ({ [0] = "なし",  "あり",  "ライン内" })[clip] or "なし";
+
+-- further calculations.
+local dx, dy = 0, 0 do
+	local W, H = pad_L + obj.w + pad_R, pad_T + obj.h + pad_B;
+	if inclusive then
+		dx, dy = W / 2, H / 2;
+		if square then dx, dy = dy, dx end
+	elseif square then
+		if W < H then dx = math.ceil((H - W) / 2);
+		else dy = math.ceil((W - H) / 2) end
+	end
+
+	-- unlike ellipses, rhombus has slopes at corners.
+	if line < 0 then
+		line = -line;
+		W, H = W + 2 * dx, H + 2 * dy;
+		local l = line * (W ^ 2 + H ^ 2) ^ 0.5;
+		dx, dy = dx + l / H, dy + l / W;
+	end
+end
+pad_L, pad_R = dx + pad_L, dx + pad_R;
+pad_T, pad_B = dy + pad_T, dy + pad_B;
+local big_radius = math.max(4000,
+	math.max(pad_L, 0) + obj.w + math.max(pad_R, 0),
+	math.max(pad_T, 0) + obj.h + math.max(pad_B, 0));
+
+-- apply effect.
+obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
+	"ライン幅", line, "色", color, "パターン画像", file_image, "透明度", alpha,
+	"背景色", color_back, "背景パターン画像", file_back, "背景透明度", alpha_back,
+	"前景透明度", alpha_front,
+	"角半径", big_radius, "丸角形状", "菱形", "丸角縦横比固定", 0,
+	"PI", ("pad_X={%d,%d},pad_Y={%d,%d},line_x=%s,line_y=%s,back_x=%s,back_y=%s"):format(
+		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
+
+@透明度適用
+--information:透明度適用@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\加工
+--track@alpha:透明度,-100,100,0,0.01
+--check@apply_former:累積分も適用,0
+--[[pixelshader@const_alpha:
+cbuffer constant0 : register(b0) {
+	float alpha;
+};
+float4 const_alpha(float4 pos : SV_Position) : SV_Target
+{
+	return float4(0, 0, 0, alpha);
+}
+]]
+local obj, math = obj, math;
+alpha = math.min(math.max(1 - alpha / 100, 0), 2);
+if apply_former ~= 0 then obj.alpha, alpha = 1, alpha * obj.alpha end
+if alpha ~= 1 then obj.pixelshader("const_alpha", "object", nil, { alpha }, "mask") end
+
+@透明度二値化
+--information:透明度二値化@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\加工
+--track@alpha:基準透明度,0,100,50,0.01
+--track@buffer:ぼかし幅,0,100,8,0.01
+--value@PI:PI,{}
+--[[pixelshader@apply:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float alpha, buffer;
+};
+float4 apply(float4 pos : SV_Position) : SV_Target
+{
+	const float4 col = src.Load(int3(pos.xy, 0));
+	const float a = smoothstep(1.0 / 8192, buffer, col.a - alpha);
+	return float4((col.a > 0 ?  a / col.a : 0) * col.rgb, a);
+}
+]]
+local obj, math, tonumber=obj, math, tonumber;
+
+-- take parameters.
+--[==[
+	PI = {
+		alpha:	number?,
+		buffer:	number?,
+	}
+]==]
+alpha = tonumber(PI.alpha) or alpha;
+buffer = tonumber(PI.buffer) or buffer;
+
+-- normalize parameters.
+local least_a = 2 ^ -12;
+alpha = math.min(math.max(1 - alpha / 100, 0), 1 - least_a);
+buffer = math.min(math.max(buffer / 100, least_a), 1);
+
+-- apply.
+if alpha > 0 or buffer < 1 then
+	obj.pixelshader("apply", "object", "object", { alpha, buffer });
+end
+
+@色調補正
+--information:色調補正@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\色調整
+--track@add_light:明るさ,0,200,100,0.01
+--track@contrast:コントラスト,0,200,100,0.01
+--track@angle:色相,-720,720,0,0.01
+--track@mul_light:輝度,0,200,100,0.01
+--check@rev_light:輝度反転,0
+--track@mul_sat:彩度,0,200,100,0.01
+--check@saturate:飽和する,0
+--select@space:色空間=4,XYZ(sRGB)=0,YUV(BT.601)=1,YUV(BT.709)=2,YUV(BT.2020)=3,HSV(円柱)=4,HSV(円錐)=5,HSL(円柱)=6,HSL(双円錐)=7
+--value@PI:PI,{}
+--[[pixelshader@by_xyz:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float3x3 mat;
+	float add_light, sat;
+};
+float3 to_lin(float3 c)
+{
+	static const float4 K = { 0.055, 1 / 1.055, 1 / 12.92, 0.04045 };
+	return abs(c) <= K.w ? K.z * c : sign(c) * pow((abs(c) + K.x) * K.y, 2.4);
+}
+float3 from_lin(float3 c)
+{
+	static const float4 K = { 0.055, 1.055, 12.92, 0.0031308 };
+	return abs(c) <= K.w ? K.z * c : sign(c) * (K.y * pow(abs(c), 1 / 2.4) - K.x);
+}
+float4 by_xyz(float4 pos : SV_Position) : SV_Target
+{
+	float4 c = src.Load(int3(pos.xy, 0));
+	c.rgb = to_lin(c.a > 0 ? c.rgb / c.a : 0);
+	c.rgb = mul(mat, c.rgb) + add_light;
+	c.rgb = c.a * from_lin(c.rgb);
+	if (sat > 0) c.rgb = clamp(c.rgb, 0, c.a);
+	return c;
+}
+]]
+--[[pixelshader@by_yuv:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float3x3 mat;
+	float add_light, sat;
+};
+float4 by_yuv(float4 pos : SV_Position) : SV_Target
+{
+	float4 c = src.Load(int3(pos.xy, 0));
+	c.rgb = mul(mat, c.rgb) + add_light * c.a;
+	if (sat > 0) c.rgb = clamp(c.rgb, 0, c.a);
+	return c;
+}
+]]
+--[[pixelshader@by_hsvl:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float3 mul_col, add_col;
+	float col_space_f, sat;
+};
+// modified from: https://gist.github.com/983/e170a24ae8eba2cd174f
+float3 rgb2hsvl(float3 c, uint col_space)
+{
+    static const float4 K = { 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 };
+    const float4
+		p = c.b > c.g ? float4(c.bg, K.wz) : float4(c.gb, K.xy),
+    	q = p.x > c.r ? float4(p.xyw, c.r) : float4(c.r, p.yzx);
+    const float d = q.x - min(q.w, q.y);
+	float3 ret = { abs(q.z + (d > 0 ? (q.w - q.y) / (6 * d) : 0)), d, q.x };
+
+	if (col_space >= 2) {
+		ret.z -= ret.y / 2;
+		if (col_space == 2) {
+			const float u = 2 * min(ret.z, 1 - ret.z);
+			ret.y = u != 0 ? ret.y / u : 0;
+		}
+	}
+	else if (col_space == 0)
+		ret.y = ret.z != 0 ? ret.y / ret.z : 0;
+	return ret;
+}
+float3 hsvl2rgb(float3 c, uint col_space)
+{
+	if (col_space >= 2) {
+		if (col_space == 2)
+			c.y *= 2 * min(c.z, 1 - c.z);
+		c.z += c.y / 2;
+	}
+	else if (col_space == 0) c.y *= c.z;
+
+    static const float3 K = { 1.0, 2.0 / 3.0, 1.0 / 3.0 };
+    const float3 p = 6 * abs(frac(c.x + K) - 0.5);
+    return c.z - c.y * saturate(2 - p);
+}
+
+float4 by_hsvl(float4 pos : SV_Position) : SV_Target
+{
+	float4 c = src.Load(int3(pos.xy, 0));
+	c.xyz = rgb2hsvl(c.a != 0 ? c.rgb / c.a : 0, col_space_f);
+
+	c.xyz *= mul_col;
+	c.xyz += add_col;
+
+	c.rgb = hsvl2rgb(c.xyz, col_space_f) * c.a;
+	if (sat > 0) c.rgb = clamp(c.rgb, 0, c.a);
+	return c;
+}
+]]
+local obj, math, tonumber, type, unpack = obj, math, tonumber, type, unpack;
+
+-- take parameters.
+--[==[
+	PI = {
+		add_light:	number?,
+		contrast:	number?,
+		angle:		number?,
+		mul_light:	number?,
+		rev_light:	boolean|number|nil,
+		mul_sat:	number?,
+		saturate:	boolean|number|nil,
+		space:		string?,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+add_light = tonumber(PI.add_light) or add_light;
+contrast = tonumber(PI.contrast) or contrast;
+angle = tonumber(PI.angle) or angle;
+mul_light = tonumber(PI.mul_light) or mul_light;
+rev_light = as_bool(PI.rev_light, rev_light ~= 0);
+mul_sat = tonumber(PI.mul_sat) or mul_sat;
+saturate = as_bool(PI.saturate, saturate ~= 0);
+if type(PI.space) == "string" then
+	space = ({
+		["XYZ(sRGB)"] = 0, ["YUV(BT.601)"] = 1, ["YUV(BT.709)"] = 2, ["YUV(BT.2020)"] = 3,
+		["HSV(円柱)"] = 4, ["HSV(円錐)"] = 5, ["HSL(円柱)"] = 6, ["HSL(双円錐)"] = 7,
+	})[PI.space] or space;
+end
+
+-- normalize parameters.
+add_light = add_light / 100 - 1;
+contrast = math.max(contrast / 100, 0);
+angle = angle % 360;
+mul_light = math.max(mul_light / 100, 0);
+mul_sat = math.max(mul_sat / 100, 0);
+space = math.min(math.max(math.floor(0.5 + space), 0), 6);
+
+-- further calculations.
+if rev_light then add_light, mul_light = add_light + 1, -mul_light end
+add_light, mul_light, mul_sat =
+	(add_light - 0.5) * contrast + 0.5,
+	mul_light * contrast, mul_sat * contrast; -- do not cap to x2.0.
+
+-- early return for trivial cases.
+if add_light == 0 and angle == 0 and mul_light == 1 and mul_sat == 1
+	and not saturate then return end
+
+if space < 4 then
+	local mat_conv = space == 0 and {{
+	-- (scaled (YZX minus white) <- sRGB, sRGB <- scaled (YZX minus white))-pair.
+	-- minus white is to move the white point onto the line Z = X = 0.
+	-- scaling is to fit ZX within the box [-0.5, +0.5] ^ 2.
+		0.2126, 0.7152, 0.0722;
+		-0.12170414034502, -0.37829585965498, 0.5;
+		0.32638930271361, -0.5, 0.17361069728639;
+	}, {
+		1, -0.86948282117431, 2.0882435025828;
+		1, 0.072396115773113, -0.62437430170414;
+		1, 1.8431349831126, 0.035899334206509;
+	}} or space == 1 and {{ -- BT.601.
+	-- (YUV <- RGB, RGB <- YUV)-pairs.
+		0.299, 0.587, 0.114;
+		-0.16873589164786, -0.33126410835214, 0.5;
+		0.5, -0.41868758915835, -0.081312410841655;
+	}, {
+		1, 0, 1.402;
+		1, -0.34413628620102, -0.71413628620102;
+		1, 1.772, 0;
+	}} or space == 2 and {{ -- BT.709.
+		0.2126, 0.7152, 0.0722;
+		-0.11457210605734, -0.38542789394266, 0.5;
+		0.5, -0.45415290830582, -0.045847091694183;
+	}, {
+		1, 0, 1.5748;
+		1, -0.18732427293065, -0.46812427293065;
+		1, 1.8556, 0;
+	}} or {{ -- BT.2020. (same as BT.2100.)
+		0.2627, 0.678, 0.0593;
+		-0.13963006271925, -0.36036993728075, 0.5;
+		0.5, -0.45978570459786, -0.040214295402143;
+	}, {
+		1, 0, 1.4746;
+		1, -0.16455312684366, -0.57135312684366;
+		1, 1.8814, 0;
+	}};
+
+	-- prepare matrices.
+	local c, s = math.cos(math.pi / 180 * angle), math.sin(math.pi / 180 * angle);
+	local matrices = {
+		mat_conv[2], {
+			-- core part of this effect.
+				mul_light, 0, 0;
+				0, mul_sat * c, -mul_sat * s;
+				0, mul_sat * s,  mul_sat * c;
+		},
+		mat_conv[1]
+	};
+
+	-- make product.
+	local M = matrices[1];
+	for n = 2, 3 do
+		local T, U = { unpack(M) }, matrices[n];
+		for i = 1, 3 do for j = 1, 3 do
+			M[3 * (i - 1) + j] =
+				T[3 * (i - 1) + 1] * U[0 + j] +
+				T[3 * (i - 1) + 2] * U[3 + j] +
+				T[3 * (i - 1) + 3] * U[6 + j];
+		end end
+	end
+
+	-- apply shader.
+	obj.pixelshader(space == 0 and "by_xyz" or "by_yuv", "object", "object", {
+		M[1], M[4], M[7], 0;
+		M[2], M[5], M[8], 0;
+		M[3], M[6], M[9];
+		add_light;
+		saturate and 1 or 0;
+	});
+else
+	-- apply shader.
+	obj.pixelshader("by_hsvl", "object", "object", {
+		1, mul_sat, mul_light, 0;
+		angle / 360, 0, add_light;
+		space - 4;
+		saturate and 1 or 0;
+	});
+end
+
+@回転中心
+--information:回転中心@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\配置
+--track@X:X,-4000,4000,0,0.01
+--track@Y:Y,-4000,4000,0,0.01
+--track@Z:Z,-4000,4000,0,0.01
+obj.cx = obj.cx + X;
+obj.cy = obj.cy + Y;
+obj.cz = obj.cz + Z;
+
+@回転中心アンカー指定
+--information:回転中心アンカー指定@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\配置
+--track0:X,-4000,4000,0,0.01
+--track1:Y,-4000,4000,0,0.01
+--track2:Z,-4000,4000,0,0.01
+--value@PI:PI,{}
+local obj, math, tonumber = obj, math, tonumber;
+
+-- set anchors.
+obj.setanchor("track", 0, "xyz", "line");
+
+-- take parameters.
+--[==[
+	PI = {
+		X, Y, Z:	number?,
+	}
+]==]
+local X, Y, Z =
+	tonumber(PI.X) or obj.track0,
+	tonumber(PI.Y) or obj.track1,
+	tonumber(PI.Z) or obj.track2;
+
+-- further calculations.
+local cx, cy, cz =
+	X - obj.getvalue("cx"),
+	Y - obj.getvalue("cy"),
+	Z - obj.getvalue("cz");
+
+local zoom, aspect, rx, ry, rz =
+	obj.zoom * obj.getvalue("zoom") / 100, obj.getvalue("aspect"),
+	math.pi / 180 * (obj.rx + obj.getvalue("rx")),
+	math.pi / 180 * (obj.ry + obj.getvalue("ry")),
+	math.pi / 180 * (obj.rz + obj.getvalue("rz"));
+local c_x, s_x, c_y, s_y, c_z, s_z =
+	math.cos(rx), math.sin(rx), math.cos(ry), math.sin(ry), math.cos(rz), math.sin(rz);
+local dx, dy, dz = cx - obj.cx, cy - obj.cy, cz - obj.cz;
+dx, dy, dz =
+	dx * zoom * math.min(1 - obj.aspect, 1) * math.min(1 - aspect, 1),
+	dy * zoom * math.min(1 + obj.aspect, 1) * math.min(1 + aspect, 1),
+	dz * zoom;
+dx, dy = c_z * dx - s_z * dy, s_z * dx + c_z * dy;
+dz, dx = c_y * dz - s_y * dx, s_y * dz + c_y * dx;
+dy, dz = c_x * dy - s_x * dz, s_x * dy + c_x * dz;
+
+-- apply.
+obj.ox,	obj.oy,	obj.oz = obj.ox + dx, obj.oy + dy, obj.oz + dz;
+obj.cx,obj.cy,obj.cz = cx, cy, cz;
+
+@上下左右揃え
+--information:上下左右揃え@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\配置
+--track@X:左右%,-100,100,0,0.001
+--track@Y:上下%,-100,100,0,0.001
+--check@x_enabled:左右有効,1
+--check@y_enabled:上下有効,1
+--check@fix_pos:描画位置を固定,0
+local obj=obj;
+local cx, cy = obj.cx, obj.cy;
+if x_enabled ~= 0 then
+	cx = (X / 100) * obj.w / 2 - obj.getvalue("cx");
+end
+if y_enabled ~= 0 then
+	cy = (Y / 100) * obj.h / 2 - obj.getvalue("cy");
+end
+if cx ~= obj.cx or cy ~= obj.cy then
+	if fix_pos ~= 0 then
+		obj.effect("回転中心アンカー指定@Basic_S", "PI", "X="..cx..",Y=".. cy);
+	else obj.cx, obj.cy = cx, cy end
+end
+
+@直角回転
+--information:直角回転@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\配置
+--select@rot:方向=0,なし=0,90°時計回り=1,180°反転=2,90°反時計回り=3,左右反転=4,上下反転=5,右上軸反転=6,左上軸反転=7
+--check@move_center:中心の位置を変更,0
+local obj, math = obj, math;
+
+rot = math.min(math.max(math.floor(0.5 + rot), 0), 7);
+if rot == 0 then return end
+move_center = move_center ~= 0;
+
+local w, h, cx0, cy0 = obj.w, obj.h, obj.cx + obj.getvalue("cx"), obj.cy + obj.getvalue("cy");
+local cx, cy = cx0, cy0;
+local flip_hv = rot ~= 2 and rot ~= 4 and rot ~= 5;
+obj.setoption("drawtarget", "tempbuffer",
+	flip_hv and h or w, flip_hv and w or h);
+if rot < 4 then
+	cx, cy =
+		rot == 2 and -cx or (rot - 2) * cy,
+		rot == 2 and -cy or (2 - rot) * cx;
+	obj.draw(0, 0, 0, 1, 1, 0, 0, 90 * rot);
+else
+	local pts = {
+		-w / 2, -h / 2, 0;  w / 2, -h / 2, 0;
+		 w / 2,  h / 2, 0; -w / 2,  h / 2, 0;
+	};
+	if rot == 4 then
+		pts[ 1], pts[ 2], pts[ 4], pts[ 5] = pts[ 4], pts[ 5], pts[ 1], pts[ 2];
+		pts[ 7], pts[ 8], pts[10], pts[11] = pts[10], pts[11], pts[ 7], pts[ 8];
+		cx = -cx;
+	elseif rot == 5 then
+		pts[ 1], pts[ 2], pts[10], pts[11] = pts[10], pts[11], pts[ 1], pts[ 2];
+		pts[ 4], pts[ 5], pts[ 7], pts[ 8] = pts[ 7], pts[ 8], pts[ 4], pts[ 5];
+		cy = -cy;
+	elseif rot == 6 then
+		pts[ 1], pts[ 2], pts[ 7], pts[ 8] = pts[ 8], pts[ 7], pts[ 2], pts[ 1];
+		pts[ 4], pts[ 5], pts[10], pts[11] = pts[11], pts[10], pts[ 5], pts[ 4];
+		cx, cy = -cy, -cx;
+	else
+		pts[ 1], pts[ 2], pts[ 7], pts[ 8] = pts[ 2], pts[ 1], pts[ 8], pts[ 7];
+		pts[ 4], pts[ 5], pts[10], pts[11] = pts[ 5], pts[ 4], pts[11], pts[10];
+		cx, cy = cy, cx;
+	end
+	obj.drawpoly(unpack(pts));
+end
+obj.copybuffer("object", "tempbuffer");
+if not move_center then obj.cx, obj.cy = obj.cx + (cx - cx0), obj.cy + (cy - cy0) end
+
+@XYZ追加回転
+--information:XYZ追加回転@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\配置
+--track@X:X,-720,720,0,0.01
+--track@Y:Y,-720,720,0,0.01
+--track@Z:Z,-720,720,0,0.01
+--track@intensity:回転量,-200,200,100,0.01
+--check@draw:描画する,0
+--check@grouped:グループ制御,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+--[==[
+	PI = {
+		X:			number?,
+		Y:			number?,
+		Z:			number?,
+		intensity:	number?,
+		draw:		boolean|number|nil,
+		grouped:	boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+X = tonumber(PI.X) or X;
+Y = tonumber(PI.Y) or Y;
+Z = tonumber(PI.Z) or Z;
+intensity = tonumber(PI.intensity) or intensity;
+draw = as_bool(PI.draw, draw ~= 0);
+grouped = as_bool(PI.grouped, grouped ~= 0);
+
+-- normalize parameters.
+X = math.pi / 180 * (X % 360);
+Y = math.pi / 180 * (Y % 360);
+Z = math.pi / 180 * (Z % 360);
+intensity = intensity / 100;
+
+-- determine the quaternion that represents this rotation.
+local q_r, q_i, q_j, q_k do
+	local c_x, s_x, c_y, s_y, c_z, s_z =
+		math.cos(X / 2), math.sin(X / 2),
+		math.cos(Y / 2), math.sin(Y / 2),
+		math.cos(Z / 2), math.sin(Z / 2);
+	q_r, q_i, q_j, q_k = -- (c_x + i s_x) x (c_y + j s_y).
+		c_x * c_y, s_x * c_y, c_x * s_y, s_x * s_y;
+	q_r, q_i, q_j, q_k = -- x (c_z + k s_z).
+		q_r * c_z - q_k * s_z,
+		q_i * c_z + q_j * s_z,
+		q_j * c_z - q_i * s_z,
+		q_k * c_z + q_r * s_z;
+	if q_r < 0 then q_r, q_i, q_j, q_k = -q_r, -q_i, -q_j, -q_k end
+end
+
+local angle = 2 * math.atan2((q_i ^ 2 + q_j ^ 2 + q_k ^ 2) ^ 0.5, q_r);
+angle = angle * intensity;
+
+if angle ~= 0 or draw then
+	obj.effect("任意軸追加回転@Basic_S", "PI",
+		("angle=%s,X=%s,Y=%s,Z=%s,draw=%d,grouped=%d,fix_axis=1"):format(
+			180 / math.pi * angle, 512 * q_i, 512 * q_j, 512 * q_k,
+			draw and 1 or 0, grouped and 1 or 0));
+end
+
+@任意軸追加回転
+--information:任意軸追加回転@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\配置
+--track@angle:角度,-720,720,0,0.01
+--track0:回転軸X,-512,512,0,0.001
+--track1:回転軸Y,-512,512,0,0.001
+--track2:回転軸Z,-512,512,128,0.001
+--check@draw:描画する,0
+--check@grouped:グループ制御,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- set anchors.
+obj.setanchor("track", 0, "xyz");
+local X, Y, Z = obj.track0, obj.track1, obj.track2;
+local cx, cy, cz =
+	obj.cx + obj.getvalue("cx"),
+	obj.cy + obj.getvalue("cy"),
+	obj.cz + obj.getvalue("cz");
+obj.setanchor({
+	cx, cy, cz;
+	cx + X, cy + Y, cz + Z;
+}, 2, "xyz", "line", "color", 0xc0ff80);
+obj.setanchor({
+	cx + X, cy + Y, cz + Z;
+	X, Y, Z;
+}, 2, "xyz", "line");
+
+-- take parameters.
+--[==[
+	PI = {
+		angle:		number?,
+		X:			number?,
+		Y:			number?,
+		Z:			number?,
+		draw:		boolean|number|nil,
+		grouped:	boolean|number|nil,
+		fix_axis:	boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+angle = tonumber(PI.angle) or angle;
+X = tonumber(PI.X) or X;
+Y = tonumber(PI.Y) or Y;
+Z = tonumber(PI.Z) or Z;
+draw = as_bool(PI.draw, draw ~= 0);
+grouped = as_bool(PI.grouped, grouped ~= 0);
+local fix_axis = as_bool(PI.fix_axis, false);
+
+-- normalize parameters.
+angle = math.pi / 180 * (angle % 360);
+do local r = X ^ 2 + Y ^ 2 + Z ^ 2;
+	if r > 0 then
+		X, Y, Z = X / r ^ 0.5, Y / r ^ 0.5, Z / r ^ 0.5;
+	else X, Y, Z = 0, 0, 1 end
+end
+
+-- further calculations.
+local rx, ry, rz =
+	math.pi / 180 * ((obj.rx + obj.getvalue("rx")) % 360),
+	math.pi / 180 * ((obj.ry + obj.getvalue("ry")) % 360),
+	math.pi / 180 * ((obj.rz + obj.getvalue("rz")) % 360);
+
+-- rotate the axis.
+if not fix_axis then
+	local c_x, s_x, c_y, s_y, c_z, s_z =
+		math.cos(rx), math.sin(rx),
+		math.cos(ry), math.sin(ry),
+		math.cos(rz), math.sin(rz);
+	X, Y = c_z * X - s_z * Y, s_z * X + c_z * Y;
+	Z, X = c_y * Z - s_y * X, s_y * Z + c_y * X;
+	Y, Z = c_x * Y - s_x * Z, s_x * Y + c_x * Z;
+end
+
+-- determine the quaternion that represents the rotation.
+local q_r, q_i, q_j, q_k do
+	-- current rotation.
+	local c_x, s_x, c_y, s_y, c_z, s_z =
+		math.cos(rx / 2), math.sin(rx / 2),
+		math.cos(ry / 2), math.sin(ry / 2),
+		math.cos(rz / 2), math.sin(rz / 2);
+	q_r, q_i, q_j, q_k = -- (c_x + i s_x) x (c_y + j s_y).
+		c_x * c_y, s_x * c_y, c_x * s_y, s_x * s_y;
+	q_r, q_i, q_j, q_k = -- x (c_z + k s_z).
+		q_r * c_z - q_k * s_z,
+		q_i * c_z + q_j * s_z,
+		q_j * c_z - q_i * s_z,
+		q_k * c_z + q_r * s_z;
+
+	-- given rotation.
+	local c, s = math.cos(angle / 2), math.sin(angle / 2);
+	local Q_r, Q_i, Q_j, Q_k = c, s * X, s * Y, s * Z;
+
+	-- multiply the two quaternions.
+	q_r, q_i, q_j, q_k =
+		Q_r * q_r - Q_i * q_i - Q_j * q_j - Q_k * q_k,
+		Q_r * q_i + Q_i * q_r + Q_j * q_k - Q_k * q_j,
+		Q_r * q_j - Q_i * q_k + Q_j * q_r + Q_k * q_i,
+		Q_r * q_k + Q_i * q_j - Q_j * q_i + Q_k * q_r;
+end
+
+if draw then
+	-- transform vertices.
+	local max_w, max_h = obj.getinfo("image_max");
+	local zm_x, zm_y, zm_z do
+		local zoom0, aspect0 = obj.getvalue("zoom") / 100, obj.getvalue("aspect");
+		zm_x, zm_y, zm_z =
+			obj.zoom * zoom0 * math.min(1 - aspect0, 1) * math.min(1 - obj.aspect, 1),
+			obj.zoom * zoom0 * math.min(1 + aspect0, 1) * math.min(1 + obj.aspect, 1),
+			obj.zoom * zoom0;
+		obj.aspect = -aspect0;
+		obj.zoom = 1 / (zoom0 * (1 - math.abs(aspect0)));
+	end
+	local ox, oy, oz =
+		obj.ox + obj.getvalue("x"),
+		obj.oy + obj.getvalue("y"),
+		obj.oz + obj.getvalue("z");
+	local gx, gy, gz = 0, 0, oz; if grouped then gx, gy, gz = ox, oy, oz + obj.z end
+	local pts = {
+		-obj.w / 2, -obj.h / 2, 0,
+		 obj.w / 2, -obj.h / 2, 0,
+		 obj.w / 2,  obj.h / 2, 0,
+		-obj.w / 2,  obj.h / 2, 0,
+	};
+	local mat do
+		-- matrix that represents the transform:
+		--   Xi + Yj + Zk = q (xi + yj + zk) q ^ -1.
+		-- cf.) https://github.com/sigma-axis/sigma_aviutl_scripts/blob/79bce1098a69b1e8da7cb77811aa3356a411ee2d/sigma_rot_helper.lua#L107-L114
+		local R, I, J, K = q_r ^ 2, q_i ^ 2, q_j ^ 2, q_k ^ 2;
+		local ij, jk, ki = 2 * q_i * q_j, 2 * q_j * q_k, 2 * q_k * q_i;
+		local ri, rj, rk = 2 * q_r * q_i, 2 * q_r * q_j, 2 * q_r * q_k;
+		mat = {
+			R + I - J - K, ij - rk, ki + rj,
+			ij + rk, R - I + J - K, jk - ri,
+			ki - rj, jk + ri, R - I - J + K,
+		};
+	end
+	local L, R, T, B;
+	for i = 1, 4 do
+		-- transform.
+		local x, y, z =
+			zm_x * (pts[3 * i - 2] - cx),
+			zm_y * (pts[3 * i - 1] - cy),
+			zm_z * (pts[3 * i    ] - cz);
+		x, y, z =
+			mat[1] * x + mat[2] * y + mat[3] * z + gx,
+			mat[4] * x + mat[5] * y + mat[6] * z + gy,
+			mat[7] * x + mat[8] * y + mat[9] * z + gz;
+		pts[3 * i - 2], pts[3 * i - 1], pts[3 * i] = x, y, z;
+
+		-- find the position on the canvas.
+		local zx, zy, zz =
+			(ox - gx) + obj.screen_w / 2,
+			(oy - gy) + obj.screen_h / 2,
+			1 + z / 1024;
+		if zz > 0 then zx, zy = zx + x / zz, zy + y / zz;
+		else
+			zx, zy =
+				(x > 0 and 1 or x < 0 and -1 or 0) * max_w + ox + obj.screen_w / 2,
+				(y > 0 and 1 or y < 0 and -1 or 0) * max_h + oy + obj.screen_h / 2;
+		end
+		if i == 1 or L > zx then L = zx end
+		if i == 1 or R < zx then R = zx end
+		if i == 1 or T > zy then T = zy end
+		if i == 1 or B < zy then B = zy end
+	end
+	-- canvas position is determined.
+	L, R, T, B =
+		math.floor(L) - ox - obj.screen_w / 2,
+		math.ceil(R) - ox - obj.screen_w / 2,
+		math.floor(T) - oy - obj.screen_h / 2,
+		math.ceil(B) - oy - obj.screen_h / 2;
+
+	-- cap to the maximum size.
+	if R - L > max_w then
+		if L > -max_w / 2 then R = L + max_w;
+		elseif R < max_w / 2 then L = R - max_w;
+		else
+			local d = math.ceil((R - L - max_w) / 2);
+			L, R = L + d, R - d;
+		end
+	end
+	if B - T > max_h then
+		if T > -max_h / 2 then B = T + max_h;
+		elseif B < max_h / 2 then T = B - max_h;
+		else
+			local d = math.ceil((B - T - max_h) / 2);
+			T, B = T + d, B - d;
+		end
+	end
+
+	-- adjust the destination points.
+	local Cx, Cy = -(L + R) / 2, -(T + B) / 2;
+	for i = 1, 4 do
+		local zz = 1 + pts[3 * i] / 1024;
+		pts[3 * i - 2], pts[3 * i - 1] =
+			pts[3 * i - 2] + zz * (Cx - gx),
+			pts[3 * i - 1] + zz * (Cy - gy);
+	end
+
+	-- draw to tempbuffer.
+	obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+	obj.drawpoly(unpack(pts));
+	obj.copybuffer("object", "tempbuffer");
+
+	-- flatten transforms.
+	obj.oz = obj.oz - gz;
+	obj.cx, obj.cy, obj.cz =
+		obj.cx + (Cx - cx),
+		obj.cy + (Cy - cy),
+		obj.cz - cz;
+	obj.rx, obj.ry, obj.rz =
+		obj.rx - 180 / math.pi * rx,
+		obj.ry - 180 / math.pi * ry,
+		obj.rz - 180 / math.pi * rz;
+else
+	-- determine the euler angles.
+	-- cf.) https://github.com/sigma-axis/sigma_aviutl_scripts/blob/79bce1098a69b1e8da7cb77811aa3356a411ee2d/sigma_rot_helper.lua#L80-L94
+	local Rx = math.atan2(
+		2 * (q_r * q_i - q_j * q_k),
+		q_r ^ 2 - q_i ^ 2 - q_j ^ 2 + q_k ^ 2);
+	local c, s = math.cos(Rx / 2), math.sin(Rx / 2);
+	q_r, q_i, q_j, q_k = -- (c - i s) x q
+		c * q_r + s * q_i,
+		c * q_i - s * q_r,
+		c * q_j + s * q_k,
+		c * q_k - s * q_j;
+	local function calc_angle(x1,y1, x2,y2)
+		if x1 ^ 2 + y1 ^ 2 < x2 ^ 2 + y2 ^ 2 then x1, y1 = x2, y2 end
+		if x1 < 0 then x1, y1 = -x1, -y1 end
+		return 2 * math.atan2(y1, x1);
+	end
+	local Ry, Rz = calc_angle(q_r, q_j, q_k, q_i), calc_angle(q_r, q_k, q_j, q_i);
+
+	-- apply the rotation.
+	obj.rx, obj.ry, obj.rz =
+		obj.rx + 180 / math.pi * (Rx - rx),
+		obj.ry + 180 / math.pi * (Ry - ry),
+		obj.rz + 180 / math.pi * (Rz - rz);
+end
+
+@傾斜
+--information:傾斜@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\変形
+--track@angle:角度,-80,80,0,0.001
+--track@slope:傾き%,-500,500,0,0.001
+--value@baseline:基準軸,{-100,0,100,0}
+--value@PI:PI,{}
+local obj, math, tonumber = obj, math, tonumber;
+
+-- set anchors.
+obj.setanchor("baseline", 2, "line");
+
+-- take parameters.
+--[==[
+	PI = {
+		angle:		number?,
+		slope:		number?,
+	}
+]==]
+angle = tonumber(PI.angle) or angle;
+slope = tonumber(PI.slope) or slope;
+local X1, Y1, X2, Y2 =
+	tonumber(baseline[1]) or 0, tonumber(baseline[2]) or 0,
+	tonumber(baseline[3]) or 0, tonumber(baseline[4]) or 0;
+
+-- normalize parameters.
+angle = math.pi / 180 * math.min(math.max(angle, -80), 80);
+slope = math.min(math.max(slope / 100, -5), 5);
+local dx, dy = X2 - X1, Y2 - Y1;
+do local r = dx ^ 2 + dy ^ 2;
+	if r > 0 then
+		dx, dy = dx / r ^ 0.5, dy / r ^ 0.5;
+	else dx, dy = 1, 0 end
+end
+
+-- further calculations.
+slope = slope + math.tan(angle);
+if slope == 0 then return end
+
+-- measure the canvas.
+local pts = {
+	-obj.w / 2, -obj.h / 2, 0;
+	 obj.w / 2, -obj.h / 2, 0;
+	 obj.w / 2,  obj.h / 2, 0;
+	-obj.w / 2,  obj.h / 2, 0;
+};
+local m11, m12, m21, m22 =
+	1 + slope * dx * dy, -slope * dx ^ 2,
+	slope * dy ^ 2, 1 - slope * dx * dy;
+local L, R, T, B;
+for i = 1, 4 do
+	local x, y = pts[3 * i - 2] - X1, pts[3 * i - 1] - Y1;
+	x, y =
+		m11 * x + m12 * y + X1,
+		m21 * x + m22 * y + Y1;
+	pts[3 * i - 2], pts[3 * i - 1] = x, y;
+	if i == 1 or L > x then L = x end
+	if i == 1 or R < x then R = x end
+	if i == 1 or T > y then T = y end
+	if i == 1 or B < y then B = y end
+end
+local cx, cy = (L + R) / 2, (T + B) / 2;
+L, R, T, B =
+	math.floor(L - cx), math.ceil(R - cx),
+	math.floor(T - cy), math.ceil(B - cy);
+for i = 1, 4 do
+	pts[3 * i - 2], pts[3 * i - 1] =
+		pts[3 * i - 2] - cx, pts[3 * i - 1] - cy;
+end
+
+-- draw the skew image.
+obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+obj.drawpoly(unpack(pts));
+obj.copybuffer("object", "tempbuffer");
+
+-- adjust the center.
+obj.cx, obj.cy = obj.cx - cx, obj.cy - cy;
+
+@XY軸変形
+--information:XY軸変形@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\変形
+--value@axis_X:X軸,{100,0}
+--check@stretch_X:X長さ変更,0
+--value@axis_Y:Y軸,{0,-100}
+--check@stretch_Y:Y長さ変更,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- set anchors.
+obj.setanchor("axis_X", 1, "star", "color", 0xf05050);
+obj.setanchor("axis_Y", 1, "star", "color", 0x208020);
+
+-- take parameters.
+--[==[
+	PI = {
+		stretch_X = stretch_X ~= 0;
+		stretch_Y = stretch_Y ~= 0;
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+stretch_X = as_bool(PI.stretch_X, stretch_X ~= 0);
+stretch_Y = as_bool(PI.stretch_Y, stretch_Y ~= 0);
+
+-- normalize parameters.
+local xX, yX, xY, yY =
+	tonumber(axis_X[1]) or 0, tonumber(axis_X[2]) or 0,
+	tonumber(axis_Y[1]) or 0, tonumber(axis_Y[2]) or 0;
+if not stretch_X then
+	local l = (xX ^ 2 + yX ^ 2) ^ 0.5;
+	if l <= 0 then xX, yX, l = 1, 0, 1 end
+	l = l ^ -1 * obj.w / 2;
+	xX, yX = l * xX, l * yX;
+end
+if not stretch_Y then
+	local l = (xY ^ 2 + yY ^ 2) ^ 0.5;
+	if l <= 0 then xY, yY, l = 0, 1, 1 end
+	l = l ^ -1 * obj.h / 2;
+	xY, yY = l * xY, l * yY;
+end
+
+-- draw.
+obj.setoption("drawtarget", "tempbuffer",
+	2 * math.ceil(math.abs(xX) + math.abs(xY)),
+	2 * math.ceil(math.abs(yX) + math.abs(yY)));
+obj.drawpoly(
+	-xX + xY, -yX + yY, 0,  xX + xY,  yX + yY, 0,
+	 xX - xY,  yX - yY, 0, -xX - xY, -yX - yY, 0);
+obj.copybuffer("object", "tempbuffer");
+
+@領域サイズ変更
+--information:領域サイズ変更@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\クリッピング
+--track@T:上,-4000,4000,0,1
+--track@B:下,-4000,4000,0,1
+--track@L:左,-4000,4000,0,1
+--track@R:右,-4000,4000,0,1
+--check@move_center:中心の位置を変更,0
+--check@fill_blank:塗りつぶし,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+--[==[
+	PI = {
+		T:				number?,
+		B:				number?,
+		L:				number?,
+		R:				number?,
+		move_center:	boolean|number|nil,
+		fill_blank:		boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+T = tonumber(PI.T) or T;
+B = tonumber(PI.B) or B;
+L = tonumber(PI.L) or L;
+R = tonumber(PI.R) or R;
+move_center = as_bool(PI.move_center, move_center ~= 0);
+fill_blank = as_bool(PI.fill_blank, fill_blank ~= 0);
+
+-- normalize parameters.
+T = math.floor(0.5 + T);
+B = math.floor(0.5 + B);
+L = math.floor(0.5 + L);
+R = math.floor(0.5 + R);
+
+-- perform clipping and expanding.
+local cx, cy = obj.cx, obj.cy;
+if not move_center then cx, cy = cx - (R - L) / 2, cy - (B - T) / 2 end
+
+local W, H = obj.w + L + R, obj.h + T + B;
+if W <= 0 or H <= 0 then
+	-- exceptional cases where an empty region is left over.
+	while obj.h > 0 do obj.effect("クリッピング", "下", obj.h) end
+elseif not fill_blank and (
+	obj.w + math.min(L, 0) + math.min(R, 0) <= 0 or
+	obj.h + math.min(T, 0) + math.min(B, 0) <= 0) then
+	-- exceptional cases where final region does not intersect with the original.
+	while obj.w < W or obj.h < H do
+		obj.effect("領域拡張", "右", math.max(W - obj.w, 0), "下", math.max(H - obj.h, 0));
+	end
+	while obj.w > W or obj.h > H do
+		obj.effect("クリッピング", "右", math.max(obj.w - W, 0), "下", math.max(obj.h - H, 0));
+	end
+	obj.clearbuffer("object");
+else
+	-- ordinary cases. note that expanding comes first for the case
+	-- where the final region does not intersect with the original.
+	while L > 0 or R > 0 or T > 0 or B > 0 do
+		local l, r, t, b =
+			math.min(math.max(L, 0), 4000),
+			math.min(math.max(R, 0), 4000),
+			math.min(math.max(T, 0), 4000),
+			math.min(math.max(B, 0), 4000);
+		L, R, T, B = L - l, R - r, T - t, B - b;
+		obj.effect("領域拡張", "上", t, "下", b, "左", l, "右", r,
+			"塗りつぶし", fill_blank and 1 or 0);
+	end
+	while L < 0 or R < 0 or T < 0 or B < 0 do
+		local l, r, t, b =
+			math.min(math.max(-L, 0), 4000),
+			math.min(math.max(-R, 0), 4000),
+			math.min(math.max(-T, 0), 4000),
+			math.min(math.max(-B, 0), 4000);
+		L, R, T, B = L + l, R + r, T + t, B + b;
+		obj.effect("クリッピング", "上", t, "下", b, "左", l, "右", r);
+	end
+end
+
+-- adjust the center.
+obj.cx, obj.cy = cx, cy;
+
+@領域割合サイズ変更
+--information:領域割合サイズ変更@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\クリッピング
+--track@T:上%,-100,100,0,0.001
+--track@B:下%,-100,100,0,0.001
+--track@L:左%,-100,100,0,0.001
+--track@R:右%,-100,100,0,0.001
+--check@move_center:中心の位置を変更,0
+--check@fill_blank:塗りつぶし,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+--[==[
+	PI = {
+		T:				number?,
+		B:				number?,
+		L:				number?,
+		R:				number?,
+		move_center:	boolean|number|nil,
+		fill_blank:		boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+T = tonumber(PI.T) or T;
+B = tonumber(PI.B) or B;
+L = tonumber(PI.L) or L;
+R = tonumber(PI.R) or R;
+move_center = as_bool(PI.move_center, move_center ~= 0);
+fill_blank = as_bool(PI.fill_blank, fill_blank ~= 0);
+
+-- normalize parameters.
+T = math.min(math.max(T / 100, -1), 1);
+B = math.min(math.max(B / 100, -1), 1);
+L = math.min(math.max(L / 100, -1), 1);
+R = math.min(math.max(R / 100, -1), 1);
+
+-- further calculations.
+L = math.floor(0.5 + obj.w * L);
+R = math.floor(0.5 + obj.w * R);
+T = math.floor(0.5 + obj.h * T);
+B = math.floor(0.5 + obj.h * B);
+
+-- apply effect.
+if L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
+	obj.effect("領域サイズ変更@Basic_S", "PI",
+		("L=%d,R=%d,T=%d,B=%d,move_center=%d,fill_blank=%d"):format(
+			L, R, T, B, move_center and 1 or 0, fill_blank and 1 or 0));
+end
+
+@領域サイズ指定
+--information:領域サイズ指定@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\クリッピング
+--track0:X,-4000,4000,0,0.1
+--track1:Y,-4000,4000,0,0.1
+--track@width:幅,1,4000,256,1
+--track@align_x:水平揃え,-100,100,0,0.001
+--check@x_enabled:幅指定有効,1
+--track@height:高さ,1,4000,256,1
+--track@align_y:垂直揃え,-100,100,0,0.001
+--check@y_enabled:高さ指定有効,1
+--check@move_center:中心の位置を変更,0
+--check@fill_blank:塗りつぶし,0
+--check@inverted_mask:反転マスク,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- set anchors.
+if move_center == 0 then obj.setanchor("track", 0, "line") end
+
+-- take parameters.
+--[==[
+	PI = {
+		X:				number?,
+		Y:				number?,
+		width:			number?,
+		align_x:		number?,
+		x_enabled:		boolean|number|nil,
+		height:			number?,
+		align_y:		number?,
+		y_enabled:		boolean|number|nil,
+		move_center:	boolean|number|nil,
+		fill_blank:		boolean|number|nil,
+		inverted_mask:	boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+local X, Y =
+	tonumber(PI.X) or obj.track0,
+	tonumber(PI.Y) or obj.track1;
+width = tonumber(PI.width) or width;
+align_x = tonumber(PI.align_x) or align_x;
+x_enabled = as_bool(PI.x_enabled, x_enabled ~= 0);
+height = tonumber(PI.height) or height;
+align_y = tonumber(PI.align_y) or align_y;
+y_enabled = as_bool(PI.y_enabled, y_enabled ~= 0);
+move_center = as_bool(PI.move_center, move_center ~= 0);
+fill_blank = as_bool(PI.fill_blank, fill_blank ~= 0);
+inverted_mask = as_bool(PI.inverted_mask, inverted_mask ~= 0);
+
+-- normalize parameters.
+width = math.max(math.floor(0.5 + width), 1);
+height = math.max(math.floor(0.5 + height), 1);
+align_x = math.min(math.max(align_x / 100, -1), 1);
+align_y = math.min(math.max(align_y / 100, -1), 1);
+
+-- further calculations.
+local L, T =
+	math.floor(0.5 + X - width * (1 - align_x) / 2 + obj.w / 2),
+	math.floor(0.5 + Y - height * (1 - align_y) / 2 + obj.h / 2);
+local R, B = L + width, T + height;
+L, R, T, B = -L, R - obj.w, -T, B - obj.h;
+if not x_enabled then L, R = 0, 0 end
+if not y_enabled then T, B = 0, 0 end
+
+-- apply effect.
+if inverted_mask then
+	local l, t, r, b = math.max(-L, 0), math.max(-T, 0), math.max(-R, 0), math.max(-B, 0);
+	if l == 0 and r == 0 and t == 0 and b == 0 then obj.clearbuffer("object"); -- clear entirely.
+	elseif l < obj.w or r < obj.w or t < obj.h or b < obj.h then
+		obj.copybuffer("tempbuffer", "object");
+		obj.setoption("drawtarget", "tempbuffer");
+		obj.setoption("blend", "alpha_sub");
+		obj.drawpoly(
+			l - obj.w / 2, t - obj.h / 2, 0, obj.w / 2 - r, t - obj.h / 2, 0,
+			obj.w / 2 - r, obj.h / 2 - b, 0, l - obj.w / 2, obj.h / 2 - b, 0,
+			l, t, obj.w - r, t, obj.w - r, obj.h - b, l, obj.h - b);
+		obj.copybuffer("object", "tempbuffer");
+	end
+
+	-- adjust the center.
+	if move_center then
+		obj.cx, obj.cy = obj.cx + (R - L) / 2, obj.cy + (B - T) / 2;
+	end
+elseif L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
+	obj.effect("領域サイズ変更@Basic_S", "PI",
+		("L=%d,R=%d,T=%d,B=%d,move_center=%d,fill_blank=%d"):format(
+			L, R, T, B, move_center and 1 or 0, fill_blank and 1 or 0));
+end
+
+@カットずらし
+--information:カットずらし@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\クリッピング
+--track0:ずれX,-4000,4000,40,1
+--track1:ずれY,-4000,4000,0,1
+--value@crack:切り取り線,{0,-100,0,100}
+--track@crop:切り取り幅,-4000,4000,0,0.01
+--select@mode_padding:余白処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
+--select@mode_overlap:重複処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
+--check@move_center:中心の位置を変更,0
+--value@PI:PI,{}
+--[[pixelshader@place:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float2 size, offset, line_n, move;
+	float c1, crop, gap, mode_f;
+};
+
+SamplerState s;
+float4 pick(float2 pos)
+{
+	const float2 t = saturate(min(pos, size - pos) + 0.5);
+	return (t.x * t.y) * src.Sample(s, saturate(pos / size));
+}
+float4 place(float4 pos : SV_Position) : SV_Target
+{
+	const float4
+		col1 = src.Load(int3(floor(pos.xy - offset), 0)),
+		col2 = src.Load(int3(floor(pos.xy - offset - move), 0));
+
+	float phase = dot(line_n, pos.xy) - c1;
+	phase = gap > 0 ? phase / gap : step(0, phase);
+
+	float4 col3;
+	switch(int(mode_f)) {
+	case 0: default: col3 = 0; break;
+	case 1: col3 = (col1 + col2) / 2; break;
+	case 2: col3 = lerp(col1, col2, saturate(phase)); break;
+	case 3: col3 = pick(pos.xy - offset - phase * move); break;
+	}
+
+	return lerp(col1, lerp(col3, col2,
+		gap > 0 ? smoothstep(-0.5, 0.5, (phase - 1) * gap) : 1),
+		gap > 0 ? smoothstep(-0.5, 0.5, phase * gap) : phase);
+}
+]]
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- set anchors.
+if move_center == 0 then
+	obj.setanchor("track", 0, "arm");
+	obj.setanchor("crack", 2, "line", "color", 0x4040ff);
+end
+
+-- take parameters.
+--[==[
+	PI = {
+		X:				number?,
+		Y:				number?,
+		crack:			table?,
+		crop:			number?,
+		mode_padding:	string?,
+		mode_overlap:	string?,
+		move_center:	boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+X = tonumber(PI.X) or obj.track0;
+Y = tonumber(PI.Y) or obj.track1;
+if type(PI.crack) == "table" then
+	local x1, y1, x2, y2 =
+		tonumber(PI.crack[1]), tonumber(PI.crack[2]),
+		tonumber(PI.crack[3]), tonumber(PI.crack[4]);
+	if x1 and y1 and x2 and y2 then
+		crack = { x1, y1, x2, y2 };
+	end
+end
+crop = tonumber(PI.crop) or crop;
+do local name2num = { ["空白"] = 0, ["半透明"] = 1, ["補間"] = 2, ["引き伸ばし"] = 3 };
+	if type(PI.mode_padding) == "string" then mode_padding = name2num[PI.mode_padding] or mode_padding end
+	if type(PI.mode_overlap) == "string" then mode_overlap = name2num[PI.mode_overlap] or mode_overlap end
+end
+move_center = as_bool(PI.move_center, move_center ~= 0);
+
+-- normalize parameters.
+X = math.floor(0.5 + X);
+Y = math.floor(0.5 + Y);
+local x1, y1, x2, y2 =
+	tonumber(crack[1]), tonumber(crack[2]),
+	tonumber(crack[3]), tonumber(crack[4]);
+if not (x1 and y1 and x2 and y2) then x1, y1, x2, y2 = 0, -100, 0, 100 end
+local dx, dy = x2 - x1, y2 - y1 do
+	local r = dx ^ 2 + dy ^ 2;
+	if r > 0 then dx, dy = dx / r ^ 0.5, dy / r ^ 0.5;
+	else dx, dy = 0, 1 end
+end
+mode_padding = math.min(math.max(math.floor(0.5 + mode_padding), 0), 3);
+mode_overlap = math.min(math.max(math.floor(0.5 + mode_overlap), 0), 3);
+
+-- further calculations.
+local gap, c, mode = crop + (X * dy - Y * dx), x1 * dy - y1 * dx, mode_padding;
+if gap < 0 then
+	gap, c, crop, mode = -gap, c + gap, crop - 2 * gap, mode_overlap;
+end
+
+-- find the canvas size.
+local L, R, T, B do
+	-- determine the lines dividing the image.
+	local c1, c2 = c, c + crop;
+	if mode == 1 or mode == 2 then c1, c2 = c2, c1 end
+
+	-- check for each corner.
+	for i = 1, 4 do
+		local x, y =
+			obj.w / 2 * ((i % 2 ~= 0) and -1 or 1),
+			obj.h / 2 * ((i > 2) and -1 or 1);
+		local u = x * dy - y * dx;
+		if u <= c1 then
+			L, R, T, B =
+				math.min(L or x, x), math.max(R or x, x),
+				math.min(T or y, y), math.max(B or y, y);
+		end
+		if u >= c2 then
+			L, R, T, B =
+				math.min(L or x + X, x + X), math.max(R or x + X, x + X),
+				math.min(T or y + Y, y + Y), math.max(B or y + Y, y + Y);
+		end
+		if mode == 3 and crop ~= 0 then
+			-- include corners within the cropped band if stretching.
+			local phase = (u - c1) / crop;
+			if 0 <= phase and phase <= 1 then
+				x, y = x + phase * X, y + phase * Y;
+				L, R, T, B =
+					math.min(L or x, x), math.max(R or x, x),
+					math.min(T or y, y), math.max(B or y, y);
+			end
+		end
+	end
+
+	-- check for left and right crossing points.
+	if dx ~= 0 then
+		local y = ((-obj.w / 2) * dy - c1) / dx;
+		if -obj.h / 2 <= y and y <= obj.h / 2 then
+			T, B = math.min(T or y, y), math.max(B or y, y);
+		end
+		y = ((obj.w / 2) * dy - c1) / dx;
+		if -obj.h / 2 <= y and y <= obj.h / 2 then
+			T, B = math.min(T or y, y), math.max(B or y, y);
+		end
+		y = ((-obj.w / 2) * dy - c2) / dx;
+		if -obj.h / 2 <= y and y <= obj.h / 2 then
+			T, B = math.min(T or y + Y, y + Y), math.max(B or y + Y, y + Y);
+		end
+		y = ((obj.w / 2) * dy - c2) / dx;
+		if -obj.h / 2 <= y and y <= obj.h / 2 then
+			T, B = math.min(T or y + Y, y + Y), math.max(B or y + Y, y + Y);
+		end
+	end
+
+	-- check for top and bottom crossing points.
+	if dy ~= 0 then
+		local x = ((-obj.h / 2) * dx + c1) / dy;
+		if -obj.w / 2 <= x and x <= obj.w / 2 then
+			L, R = math.min(L or x, x), math.max(R or x, x);
+		end
+		x = ((obj.h / 2) * dx + c1) / dy;
+		if -obj.w / 2 <= x and x <= obj.w / 2 then
+			L, R = math.min(L or x, x), math.max(R or x, x);
+		end
+		x = ((-obj.h / 2) * dx + c2) / dy;
+		if -obj.w / 2 <= x and x <= obj.w / 2 then
+			L, R = math.min(L or x + X, x + X), math.max(R or x + X, x + X);
+		end
+		x = ((obj.h / 2) * dx + c2) / dy;
+		if -obj.w / 2 <= x and x <= obj.w / 2 then
+			L, R = math.min(L or x + X, x + X), math.max(R or x + X, x + X);
+		end
+	end
+end
+if not (L and R and T and B) or (L >= R or T >= B) then
+	-- the entire image is cropped out.
+	while obj.h > 0 do obj.effect("クリッピング", "下", obj.h) end
+	return;
+end
+
+-- canvas size determined.
+L, R, T, B =
+	math.floor(L + obj.w / 2) - obj.w / 2,
+	math.ceil(R + obj.w / 2) - obj.w / 2,
+	math.floor(T + obj.h / 2) - obj.h / 2,
+	math.ceil(B + obj.h / 2) - obj.h / 2;
+
+-- draw by shader.
+obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+obj.pixelshader("place", "tempbuffer", "object", {
+	obj.w, obj.h; -L - obj.w / 2, -T - obj.h / 2 ; dy, -dx; X, Y;
+	c - (L * dy - T * dx); crop; gap; mode;
+});
+obj.copybuffer("object", "tempbuffer");
+
+-- adjust center.
+if not move_center then
+	obj.cx, obj.cy = obj.cx - (L + R) / 2, obj.cy - (T + B) / 2;
+end
+
+@中抜きクリッピング
+--information:中抜きクリッピング@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\クリッピング
+--track0:X,-4000,4000,0,0.1
+--track1:Y,-4000,4000,0,0.1
+--track@width:幅,-4000,4000,0,1
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@gap_x:余白幅,-4000,4000,0,1
+--track@height:高さ,-4000,4000,0,1
+--track@align_y:垂直揃え,-100,100,0,0.001
+--track@gap_y:余白高さ,-4000,4000,0,1
+--select@mode_padding:余白処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
+--select@mode_overlap:重複処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
+--check@move_center:中心の位置を変更,0
+--value@PI:PI,{}
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- set anchors
+if move_center == 0 then
+	obj.setanchor("track", 0, "line");
+end
+
+-- take parameters.
+--[==[
+	PI = {
+		X:				number?,
+		Y:				number?,
+		width:			number?,
+		align_x:		number?,
+		gap_x:			number?,
+		height:			number?,
+		align_y:		number?,
+		gap_y:			number?,
+		mode_padding:	string?,
+		mode_overlap:	string?,
+		move_center:	boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+local X, Y =
+	tonumber(PI.X) or obj.track0,
+	tonumber(PI.Y) or obj.track1;
+width = tonumber(PI.width) or width;
+align_x = tonumber(PI.align_x) or align_x;
+gap_x = tonumber(PI.gap_x) or gap_x;
+height = tonumber(PI.height) or height;
+align_y = tonumber(PI.align_y) or align_y;
+gap_y = tonumber(PI.gap_y) or gap_y;
+do local name2num = { ["空白"] = 0, ["半透明"] = 1, ["補間"] = 2, ["引き伸ばし"] = 3 };
+	if type(PI.mode_padding) == "string" then mode_padding = name2num[PI.mode_padding] or mode_padding end
+	if type(PI.mode_overlap) == "string" then mode_overlap = name2num[PI.mode_overlap] or mode_overlap end
+end
+move_center = as_bool(PI.move_center, move_center ~= 0);
+
+-- normalize parameters.
+width = math.floor(0.5 + width);
+align_x = math.min(math.max(align_x / 100, -1), 1);
+gap_x = math.floor(0.5 + gap_x);
+height = math.floor(0.5 + height);
+align_y = math.min(math.max(align_y / 100, -1), 1);
+gap_y = math.floor(0.5 + gap_y);
+local mode_names = { "空白", "半透明", "補間", "引き伸ばし" };
+mode_padding = mode_names[math.min(math.max(math.floor(0.5 + mode_padding), 0), 3) + 1];
+mode_overlap = mode_names[math.min(math.max(math.floor(0.5 + mode_overlap), 0), 3) + 1];
+
+-- further calculations.
+local w, h = obj.w, obj.h;
+local l, t =
+	math.floor(0.5 + X - width * (1 - align_x) / 2 + w / 2),
+	math.floor(0.5 + Y - height * (1 - align_y) / 2 + h / 2);
+
+-- apply effect.
+if width ~= 0 or gap_x ~= 0 then
+	obj.effect("カットずらし@Basic_S", "中心の位置を変更", 1,
+		"余白処理", mode_padding, "重複処理", mode_overlap, "PI",
+		("X=%d,Y=0,crack={%f,0,%f,1},crop=%d,move_center=0"):format(
+			gap_x - width, l - w / 2, l - w / 2, width));
+	if not (obj.w > 0 and obj.h > 0) then return end -- entirely cropped.
+end
+if height ~= 0 or gap_y ~= 0 then
+	obj.effect("カットずらし@Basic_S", "中心の位置を変更", 1,
+		"余白処理", mode_padding, "重複処理", mode_overlap, "PI",
+		("X=0,Y=%d,crack={1,%f,0,%f},crop=%d,move_center=0"):format(
+			gap_y - height, t - h / 2, t - h / 2, height));
+	if not (obj.w > 0 and obj.h > 0) then return end -- entirely cropped.
+end
+
+-- adjust center.
+if move_center then
+	obj.cx, obj.cy = obj.cx + (gap_x - width) / 2, obj.cy + (gap_y - height) / 2;
+else
+	obj.cx, obj.cy =
+		obj.cx + math.floor(0.5 + (gap_x - width) * (1 - align_x) / 2),
+		obj.cy + math.floor(0.5 + (gap_y - height) * (1 - align_y) / 2);
+end
+
+@小数ぼかし
+--information:小数ぼかし@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\ぼかし
+--track@range:範囲,0,1000,5,0.01
+--track@aspect:縦横比,-100,100,0,0.001
+--track@luma_weight:光の強さ,0,60,0,0.1
+--check@fixed_size:サイズ固定,0
+--value@PI:PI,{}
+--[[pixelshader@convol:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float width_f, span_i_f, span_f, wt;
+};
+float4 convol(float4 pos : SV_Position) : SV_Target
+{
+	static const int span_i = int(span_i_f);
+	const int y = int(pos.x), x = int(width_f) - int(pos.y);
+	float4 col = span_f * src.Load(int3(x - 1, y, 0));
+	for (int dx = 0; dx < span_i; dx++)
+		col += src.Load(int3(x + dx, y, 0));
+	return wt * col;
+}
+]]
+--[[pixelshader@unweight_alpha:
+cbuffer constant0 : register(b0) {
+	float2 size_f, span_i_f, span_f, wt;
+};
+int2 sum_steps(int2 i)
+{
+	return i * (i + 1) >> 1;
+}
+float4 unweight_alpha(float4 pos : SV_Position) : SV_Target
+{
+	static const int2 size = int2(size_f), span_i = int2(span_i_f);
+	const int2 p = int2(pos.xy);
+
+	float2 sum = wt;
+	sum -= max(span_i - p, 0) * span_f + sum_steps(max(span_i - p - 1, 0));
+	sum -= max(span_i - size + p + 1, 0) * span_f + sum_steps(max(span_i - size + p, 0));
+
+	return float4(0, 0, 0, (wt.x * wt.y) / (sum.x * sum.y));
+}
+]]
+--[[pixelshader@weight_luma:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float log2_base, scale;
+};
+static const float3x3 mat_rgb2yc = {
+	0.299, 0.587, 0.114,
+	-0.16873589, -0.3312641, 0.5,
+	0.5, -0.41868758, -0.08131241
+};
+float4 weight_luma(float4 pos : SV_Position) : SV_Target
+{
+	float4 col = src.Load(int3(pos.xy, 0));
+	col.xyz = mul(mat_rgb2yc, col.rgb);
+	col.x = scale * (exp2(log2_base * (col.a > 0 ? col.x / col.a : 0)) - 1) * col.a;
+	return col;
+}
+]]
+--[[pixelshader@unweight_luma:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float r_log2_base, r_scale;
+};
+static const float3x3 mat_yc2rgb = {
+	1, 0, 1.402,
+	1, -0.3441363, -0.7141363,
+	1, 1.772, 0
+};
+float4 unweight_luma(float4 pos : SV_Position) : SV_Target
+{
+	float4 col = src.Load(int3(pos.xy, 0));
+	col.x = r_log2_base * log2(1 + r_scale * (col.a > 0 ? col.x / col.a : 0)) * col.a;
+	col.rgb = mul(mat_yc2rgb, col.xyz);
+	return col;
+}
+]]
+local obj, math, tonumber, type = obj, math, tonumber, type;
+
+-- take parameters.
+--[==[
+	PI = {
+		range:			number?,
+		aspect:			number?,
+		luma_weight:	number?,
+		fixed_size:		boolean|number|nil,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+range = tonumber(PI.range) or range;
+aspect = tonumber(PI.aspect) or aspect;
+luma_weight = tonumber(PI.luma_weight) or luma_weight;
+fixed_size = as_bool(PI.fixed_size, fixed_size ~= 0);
+
+-- normalize parameters.
+range = math.min(math.max(range, 0), 1000);
+aspect = math.min(math.max(aspect / 100, -1), 1);
+luma_weight = math.min(math.max(luma_weight, 0), 60);
+if range == 0 then return end
+
+-- further calculations.
+local span_x, span_y = range * math.min(1 + aspect, 1) + 1, range * math.min(1 - aspect, 1) + 1;
+local span_x_i, span_y_i = math.ceil(span_x) - 1, math.ceil(span_y) - 1;
+local span_x_f, span_y_f = span_x - span_x_i, span_y - span_y_i;
+
+-- weight to luma.
+local log_base = 256 * math.log(1 + luma_weight / 1000, 2);
+local luma_scale = 2 ^ (12 - log_base); -- for float16 not to overflow.
+if luma_weight > 0 then
+	obj.pixelshader("weight_luma", "object", "object", { log_base, luma_scale });
+end
+
+-- apply the blur by shaders.
+local w, h = obj.w, obj.h;
+obj.setoption("drawtarget", "tempbuffer", h, w + span_x_i);
+obj.pixelshader("convol", "tempbuffer", "object", { w, span_x_i, span_x_f, 1 / span_x });
+obj.effect("領域拡張", "右", span_x_i, "下", span_y_i);
+obj.pixelshader("convol", "object", "tempbuffer", { h, span_y_i, span_y_f, 1 / span_y });
+obj.setoption("drawtarget", "tempbuffer", h + span_y_i, w + 2 * span_x_i);
+obj.pixelshader("convol", "tempbuffer", "object", { w + span_x_i, span_x_i, span_x_f, 1 / span_x });
+obj.effect("領域拡張", "右", span_x_i, "下", span_y_i);
+obj.pixelshader("convol", "object", "tempbuffer", { h + span_y_i, span_y_i, span_y_f, 1 / span_y });
+
+-- normalize the sum on the edges.
+if fixed_size then
+	obj.effect("クリッピング", "左", span_x_i, "右", span_x_i, "上", span_y_i, "下", span_y_i);
+	obj.pixelshader("unweight_alpha", "object", nil, {
+		w, h; span_x_i, span_y_i; span_x_f, span_y_f;
+		span_x ^ 2, span_y ^ 2;
+	}, "mask");
+end
+
+-- remove the weight of luma.
+if luma_weight > 0 then
+	obj.pixelshader("unweight_luma", "object", "object", { 1 / log_base, 1 / luma_scale });
+end
+
+@縁取りα
+--information:縁取りα@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\装飾
+--track@size:サイズ,-500,500,5,1
+--track@blur:ぼかし,0,100,5,1
+--track@alpha:透明度,0,100,0,0.01
+--color@color:縁色,0xffffff
+--file@file_image:パターン画像
+--track0:画像X,-4000,4000,0,1
+--track1:画像Y,-4000,4000,0,1
+--track@alpha_front:前景透明度,0,100,0,0.01
+--value@PI:PI,{}
+--[[pixelshader@carve:
+Texture2D src : register(t0);
+Texture2D eff : register(t1);
+cbuffer constant0 : register(b0) {
+	float4 color;
+	float size;
+};
+float4 carve(float4 pos : SV_Position) : SV_Target
+{
+	const float
+		a = src.Load(int3(pos.xy - 0.5 - size, 0)).a,
+		A = eff.Load(int3(pos.xy, 0)).a;
+	return saturate(A - a) * color;
+}
+]]
+--[[pixelshader@recolor:
+Texture2D mask : register(t0);
+Texture2D img : register(t1);
+cbuffer constant0 : register(b0) {
+	float2 offset, size_f;
+};
+float4 recolor(float4 pos : SV_Position) : SV_Target
+{
+	static const uint2 size = size_f;
+	int2 pt = floor(pos.xy - 0.5 - offset);
+	pt = pt >= 0 ? uint2(pt) % size : size - 1 - int2(uint2(-1 - pt) % size);
+	return mask.Load(int3(pos.xy, 0)).a * img.Load(int3(pt, 0));
+}
+]]
+--[[pixelshader@blend:
+Texture2D img1 : register(t0);
+Texture2D img2 : register(t1);
+cbuffer constant0 : register(b0) {
+	float a1, a2, size;
+};
+float4 blend(float4 pos : SV_Position) : SV_Target
+{
+	const float4
+		col1 = img1.Load(int3(pos.xy - 0.5 - size, 0)),
+		col2 = img2.Load(int3(pos.xy, 0));
+	return a1 * col1 + a2 * col2;
+}
+]]
+--[[pixelshader@combine:
+Texture2D src_i : register(t0);
+Texture2D src_o : register(t1);
+cbuffer constant0 : register(b0) {
+	float a_i, a_o;
+};
+float4 combine(float4 pos : SV_Position) : SV_Target
+{
+	const float4
+		col_i = src_i.Load(int3(pos.xy, 0)),
+		col_o = src_o.Load(int3(pos.xy, 0)) * a_o;
+	return col_i.a * col_o + a_i * (1 - col_o.a) * col_i;
+}
+]]
+local obj, math, bit, tonumber, type = obj, math, bit, tonumber, type;
+
+-- set anchors.
+if #file_image >= 4 then
+	obj.setanchor("track", 0, "line");
+end
+
+-- take parameters.
+--[==[
+	PI = {
+		size:			number?,
+		blur:			number?,
+		alpha:			number?,
+		color:			number?,
+		file_image:		string?,
+		X:				number?,
+		Y:				number?,
+		alpha_front:	number?,
+	}
+]==]
+size = tonumber(PI.size) or size;
+blur = tonumber(PI.blur) or blur;
+alpha = tonumber(PI.alpha) or alpha;
+color = tonumber(PI.color) or color;
+file_image = type(PI.file_image) == "string" and PI.file_image or file_image;
+local X, Y =
+	tonumber(PI.X) or obj.track0,
+	tonumber(PI.Y) or obj.track1;
+alpha_front = tonumber(PI.alpha_front) or alpha_front;
+
+-- normalize parameters.
+size = math.min(math.max(math.floor(0.5 + size), -500), 500);
+blur = math.min(math.max(math.floor(0.5 + blur), 0), 100);
+alpha = math.min(math.max(1 - alpha / 100, 0), 1);
+color = math.floor(0.5 + color) % 2 ^ 24;
+alpha_front = math.min(math.max(1 - alpha_front / 100, 0), 1);
+local has_image = #file_image >= 4;
+
+-- early returns for trivial cases.
+if size == 0 or alpha == 0 then
+	if alpha_front < 1 then
+		obj.effect("透明度適用@Basic_S", "透明度", 100 * (1 - alpha_front));
+	end
+	if size > 0 then
+		obj.effect("領域拡張", "左", size, "右", size, "上", size, "下", size);
+	end
+	return;
+elseif size > 0 and alpha == 1 and alpha_front == 1 and not has_image then
+	-- ordinary border.
+	obj.effect("縁取り", "サイズ", size, "ぼかし", blur, "縁色", color);
+	return;
+end
+
+-- prepare border.
+obj.copybuffer("tempbuffer", "object");
+if size > 0 then
+	-- outer (ordinary) border.
+	obj.effect("縁取り", "サイズ", size, "ぼかし", blur, "縁色", color);
+	obj.pixelshader("carve", "object", { "tempbuffer", "object" }, {
+		bit.band(color, 0xff0000) / 0xff0000,
+		bit.band(color, 0x00ff00) / 0x00ff00,
+		bit.band(color, 0x0000ff) / 0x0000ff, 1;
+		size;
+	});
+else
+	-- inner border.
+	local chrome_size = math.max(math.ceil(-size / 8), 4);
+	obj.effect("領域拡張", "左", chrome_size, "右", chrome_size, "上", chrome_size, "下", chrome_size);
+	obj.effect("反転", "透明度反転", 1);
+	obj.effect("縁取り", "サイズ", -size, "ぼかし", blur, "縁色", color);
+	chrome_size = chrome_size - size;
+	obj.effect("クリッピング", "左", chrome_size, "右", chrome_size, "上", chrome_size, "下", chrome_size);
+end
+
+-- color by image when set.
+if has_image then
+	local obj_props = { obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha };
+	local w, h = obj.w, obj.h;
+	local cache_name = "cache:basic_s/border_alpha/bdr";
+	obj.copybuffer(cache_name, "object");
+
+	obj.load("image", file_image);
+	if obj.w > 0 or obj.h > 0 then
+		obj.pixelshader("recolor", cache_name, { cache_name, "object" }, {
+			math.floor((w - obj.w) / 2) + X, math.floor((h - obj.h) / 2) + Y;
+			obj.w, obj.h;
+		});
+	else has_image = false end
+
+	obj.copybuffer("object", cache_name);
+	obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha = unpack(obj_props);
+end
+if not has_image and size < 0 then
+	-- color the chrome here.
+	obj.effect("単色化", "輝度を保持する", 0, "色", color);
+end
+
+-- combine by shaders.
+if size < 0 then
+	obj.pixelshader("combine", "object", { "tempbuffer", "object" }, {
+		alpha_front, alpha,
+	});
+elseif alpha_front > 0 then
+	obj.pixelshader("blend", "object", { "tempbuffer", "object" }, {
+		alpha_front, alpha, size,
+	});
+end
+
+@四角縁取り
+--information:四角縁取り@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\装飾
+--track@size:サイズ,-500,500,5,0.01
+--track@aspect:縦横比,-100,100,0,0.001
+--track@blur:ぼかし,0,100,0,0.01
+--track@alpha:透明度,0,100,0,0.01
+--color@color:縁色,0xffffff
+--file@file_image:パターン画像
+--track0:画像X,-4000,4000,0,1
+--track1:画像Y,-4000,4000,0,1
+--track@alpha_front:前景透明度,0,100,0,0.01
+--value@PI:PI,{}
+--[[computeshader@convol_h:
+RWTexture2D<half4> dst : register(u0);
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float size_i_f, size_f, offset_f;
+};
+half4 encode(float a)
+{
+	const uint n = asuint(a);
+	return half4((n >> 0) & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff);
+}
+[numthreads(1, 1, 1)]
+void convol_h(uint2 id : SV_DispatchThreadID)
+{
+	static const int
+		size_i = floor(size_i_f),
+		offset = offset_f;
+	const int x0 = id.x - offset, y0 = id.y;
+	float a = size_f * src.Load(int3(x0, y0, 0)).a;
+	for (int x = 0; x <= 2 * size_i; x++)
+		a += src.Load(int3(x0 + x + 1, y0, 0)).a;
+	a += size_f * src.Load(int3(x0 + 2 * size_i + 2, y0, 0)).a;
+	dst[id] = encode(a);
+}
+]]
+--[[pixelshader@convol_v:
+Texture2D<half4> src : register(t0);
+cbuffer constant0 : register(b0) {
+	float4 color;
+	float size_i_f, size_f, offset_f, blur, inv;
+};
+float decode(half4 c)
+{
+	const uint n =
+		(uint(c.r) << 0) | (uint(c.g) << 8) | (uint(c.b) << 16) | (uint(c.a) << 24);
+	return asfloat(n);
+}
+float4 convol_v(float4 pos : SV_Position) : SV_Target
+{
+	static const int
+		size_i = floor(size_i_f),
+		offset = offset_f;
+	const int x0 = floor(pos.x), y0 = floor(pos.y) - offset;
+	float a = size_f * decode(src.Load(int3(x0, y0, 0)));
+	for (int y = 0; y <= 2 * size_i; y++)
+		a += decode(src.Load(int3(x0, y0 + y + 1, 0)));
+	a += size_f * decode(src.Load(int3(x0, y0 + 2 * size_i + 2, 0)));
+	if (inv >= 0) a = inv - a;
+
+	return saturate(blur * a) * color;
+}
+]]
+--[[pixelshader@carve:
+Texture2D src : register(t0);
+Texture2D eff : register(t1);
+cbuffer constant0 : register(b0) {
+	float4 color;
+	float2 size;
+};
+float4 carve(float4 pos : SV_Position) : SV_Target
+{
+	const float
+		a = src.Load(int3(pos.xy - 0.5 - size, 0)).a,
+		A = eff.Load(int3(pos.xy, 0)).a;
+	return saturate(A - a) * color;
+}
+]]
+--[[pixelshader@recolor:
+Texture2D mask : register(t0);
+Texture2D img : register(t1);
+cbuffer constant0 : register(b0) {
+	float2 offset, size_f;
+};
+float4 recolor(float4 pos : SV_Position) : SV_Target
+{
+	static const uint2 size = size_f;
+	int2 pt = floor(pos.xy - 0.5 - offset);
+	pt = pt >= 0 ? uint2(pt) % size : size - 1 - int2(uint2(-1 - pt) % size);
+	return mask.Load(int3(pos.xy, 0)).a * img.Load(int3(pt, 0));
+}
+]]
+--[[pixelshader@blend:
+Texture2D img1 : register(t0);
+Texture2D img2 : register(t1);
+cbuffer constant0 : register(b0) {
+	float2 size;
+	float a1, a2;
+};
+float4 blend(float4 pos : SV_Position) : SV_Target
+{
+	const float4
+		col1 = img1.Load(int3(pos.xy - 0.5 - size, 0)),
+		col2 = img2.Load(int3(pos.xy, 0));
+	return a1 * col1 + a2 * col2;
+}
+]]
+--[[pixelshader@combine:
+Texture2D src_i : register(t0);
+Texture2D src_o : register(t1);
+cbuffer constant0 : register(b0) {
+	float a_i, a_o;
+};
+float4 combine(float4 pos : SV_Position) : SV_Target
+{
+	const float4
+		col_i = src_i.Load(int3(pos.xy, 0)),
+		col_o = src_o.Load(int3(pos.xy, 0)) * a_o;
+	return col_i.a * col_o + a_i * (1 - col_o.a) * col_i;
+}
+]]
+local obj, math, bit, tonumber, type = obj, math, bit, tonumber, type;
+
+if #file_image >= 4 then
+	obj.setanchor("track", 0, "line");
+end
+
+-- take parameters.
+--[==[
+	PI = {
+		size:			number?,
+		aspect:			number?,
+		blur:			number?,
+		alpha:			number?,
+		color:			number?,
+		file_image:		string?,
+		X:				number?,
+		Y:				number?,
+		alpha_front:	number?,
+	}
+]==]
+size = tonumber(PI.size) or size;
+aspect = tonumber(PI.aspect) or aspect;
+blur = tonumber(PI.blur) or blur;
+alpha = tonumber(PI.alpha) or alpha;
+color = tonumber(PI.color) or color;
+file_image = type(PI.file_image) == "string" and PI.file_image or file_image;
+local X, Y =
+	tonumber(PI.X) or obj.track0,
+	tonumber(PI.Y) or obj.track1;
+alpha_front = tonumber(PI.alpha_front) or alpha_front;
+
+-- normalize parameters.
+size = math.min(math.max(size, -500), 500);
+aspect = math.min(math.max(aspect / 100, -1), 1);
+blur = math.min(math.max(blur / 100, 0), 1);
+alpha = math.min(math.max(1 - alpha / 100, 0), 1);
+color = math.floor(0.5 + color) % 2 ^ 24;
+alpha_front = math.min(math.max(1 - alpha_front / 100, 0), 1);
+local has_image = #file_image >= 4;
+
+-- further calculations.
+local col_r, col_g, col_b =
+	bit.band(color, 0xff0000) / 0xff0000,
+	bit.band(color, 0x00ff00) / 0x00ff00,
+	bit.band(color, 0x0000ff) / 0x0000ff;
+local size_x, size_y = size * math.min(1 - aspect, 1), size * math.min(1 + aspect, 1);
+local size_x_i, size_y_i = math.ceil(math.abs(size_x)) - 1, math.ceil(math.abs(size_y)) - 1;
+local size_x_f, size_y_f = math.abs(size_x) - size_x_i, math.abs(size_y) - size_y_i;
+if size_x_i < 0 then size_x_f = size_x_f / 2 end
+if size_y_i < 0 then size_y_f = size_y_f / 2 end
+local size_xy = (2 * math.abs(size_x) + 1) * (2 * math.abs(size_y) + 1);
+local w, h, W, H = obj.w, obj.h,
+	obj.w + 2 * (size > 0 and size_x_i + 1 or 0),
+	obj.h + 2 * (size > 0 and size_y_i + 1 or 0);
+
+-- early returns for trivial cases.
+if size == 0 or alpha == 0 then
+	if alpha_front < 1 then
+		obj.effect("透明度適用@Basic_S", "透明度", 100 * (1 - alpha_front));
+	end
+	if size > 0 then
+		obj.effect("領域拡張",
+			"左", 2 * (size_x_i + 1), "右", 2 * (size_x_i + 1),
+			"上", 2 * (size_y_i + 1), "下", 2 * (size_y_i + 1));
+	end
+	return;
+end
+
+-- prepare border.
+obj.setoption("drawtarget", "tempbuffer", W, H);
+obj.computeshader("convol_h", "tempbuffer", "object", {
+	size_x_i, size_x_f,
+	size > 0 and 2 * (size_x_i + 1) or (size_x_i + 1)
+}, W, h);
+obj.pixelshader("convol_v", "tempbuffer", "tempbuffer", {
+	col_r, col_g, col_b, 1;
+	size_y_i; size_y_f;
+	size > 0 and 2 * (size_y_i + 1) or (size_y_i + 1);
+	1 / (blur * (size_xy - 1) + 1);
+	size > 0 and -1 or size_xy;
+});
+if size > 0 then
+	obj.pixelshader("carve", "tempbuffer", { "object", "tempbuffer" }, {
+		col_r, col_g, col_b, 1;
+		size_x_i + 1, size_y_i + 1;
+	});
+end
+
+-- color by image when set.
+if has_image then
+	local obj_props = { obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha };
+	local cache_name = "cache:basic_s/border_rect/obj";
+	obj.copybuffer(cache_name, "object");
+
+	obj.load("image", file_image);
+	if obj.w > 0 or obj.h > 0 then
+		obj.pixelshader("recolor", "tempbuffer", { "tempbuffer", "object" }, {
+			math.floor((W - obj.w) / 2) + X, math.floor((H - obj.h) / 2) + Y;
+			obj.w, obj.h;
+		});
+	else has_image = false end
+
+	obj.copybuffer("object", cache_name);
+	obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha = unpack(obj_props);
+end
+
+-- combine by shaders.
+if size > 0 then
+	obj.pixelshader("blend", "tempbuffer", { "object", "tempbuffer" }, {
+		size_x_i + 1, size_y_i + 1;
+		alpha_front, alpha,
+	});
+	obj.copybuffer("object", "tempbuffer");
+else
+	obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
+		alpha_front, alpha, size,
+	});
+end
+
+@内側シャドウ
+--information:内側シャドウ@Basic_S v1.00 (for beta15) by σ軸
+--label:Basic_S\装飾
+--track@X:X,-1000,1000,-40,0.01
+--track@Y:Y,-1000,1000,24,0.01
+--track@alpha:濃さ,0,100,40,0.01
+--track@blur:拡散,0,500,10,0.01
+--color@color:影色,0x000000
+--file@file_image:パターン画像
+--track0:画像X,-4000,4000,0,1
+--track1:画像Y,-4000,4000,0,1
+--select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--value@PI:PI,{}
+--[[pixelshader@recol_img:
+Texture2D mask : register(t0);
+Texture2D img : register(t1);
+cbuffer constant0 : register(b0) {
+	float2 offset, size_f;
+};
+float4 recol_img(float4 pos : SV_Position) : SV_Target
+{
+	static const uint2 size = size_f;
+	int2 pt = floor(pos.xy - 0.5 - offset);
+	pt = pt >= 0 ? uint2(pt) % size : size - 1 - int2(uint2(-1 - pt) % size);
+	const float4 col = mask.Load(int3(pos.xy, 0));
+	return (1 - col.a) * img.Load(int3(pt, 0));
+}
+]]
+--[[pixelshader@recol_one:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float4 color;
+};
+float4 recol_one(float4 pos : SV_Position) : SV_Target
+{
+	const float4 col = src.Load(int3(pos.xy, 0));
+	return (1 - col.a) * color;
+}
+]]
+--[[pixelshader@unalpha:
+Texture2D src : register(t0);
+float4 unalpha(float4 pos : SV_Position) : SV_Target
+{
+	const float4 col = src.Load(int3(pos.xy, 0));
+	return float4(col.a > 0 ? col.rgb / col.a : 0, 1);
+}
+]]
+--[[pixelshader@identity:
+Texture2D src : register(t0);
+float4 identity(float4 pos : SV_Position) : SV_Target
+{
+	return src.Load(int3(pos.xy, 0));
+}
+]]
+local obj,math,bit,tonumber,type=obj,math,bit,tonumber,type;
+
+-- set anchors.
+if #file_image >= 4 then obj.setanchor("track", 0, "line") end
+
+-- take parameters.
+--[==[
+	PI = {
+		X:			number?,
+		Y:			number?,
+		alpha:		number?,
+		blur:		number?,
+		color:		number?,
+		file_image:	string?,
+		img_X:		number?,
+		img_Y:		number?,
+		blend:		string?,
+	}
+]==]
+X = tonumber(PI.X) or X;
+Y = tonumber(PI.Y) or Y;
+alpha = tonumber(PI.alpha) or alpha;
+blur = tonumber(PI.blur) or blur;
+color = tonumber(PI.color) or color;
+file_image = type(PI.file_image) == "string" and PI.file_image or file_image;
+local img_X, img_Y =
+	tonumber(PI.img_X) or obj.track0,
+	tonumber(PI.img_Y) or obj.track1;
+blend = math.min(math.max(math.floor(0.5 + blend), 0), 12);
+if type(PI.blend) == "string" then
+	blend = ({
+		["通常"] = 0, ["加算"] = 1, ["減算"] = 2, ["乗算"] = 3, ["スクリーン"] = 4, ["オーバーレイ"] = 5,
+		["比較(明)"] = 6, ["比較(暗)"] = 7, ["輝度"] = 8, ["色差"] = 9,
+		["陰影"] = 10, ["明暗"] = 11, ["差分"] = 12,
+		["alpha_add"] = 100, ["alpha_max"] = 101, ["alpha_sub"] = 102, ["alpha_add2"] = 103,
+	})[PI.blend] or blend;
+end
+
+-- normalize parameters.
+alpha = math.min(math.max(alpha / 100, 0), 1);
+blur = math.max(blur, 0);
+color = math.floor(0.5 + color) % 2 ^ 24;
+img_X = math.floor(0.5 + img_X);
+img_Y = math.floor(0.5 + img_Y);
+blend = ({
+	[0] = "none", "add", "sub", "mul", "screen", "overlay",
+	"light", "dark", "brightness", "chroma", "shadow", "light_dark", "diff",
+	[100] = "alpha_add", [101] = "alpha_max", [102] = "alpha_sub", [103] = "alpha_add2",
+})[blend] or "none";
+
+-- prepare for blending.
+local cache_name = "cache:basic_s/inner_shadow/obj";
+obj.copybuffer(cache_name, "object");
+if blur > 0 then obj.effect("小数ぼかし@Basic_S", "PI", "range="..blur) end
+if X ~= 0 or Y ~= 0 or blur > 0 then
+	local b = math.ceil(blur);
+	obj.effect("領域拡張",
+		"左", math.max(X, 0), "右", math.max(-X, 0),
+		"上", math.max(Y, 0), "下", math.max(-Y, 0));
+	obj.effect("クリッピング", "中心の位置を変更", 1,
+		"左", math.max(-X, 0) + b, "右", math.max(X, 0) + b,
+		"上", math.max(-Y, 0) + b, "下", math.max(Y, 0) + b);
+end
+
+-- color the blurred shape.
+local has_image = #file_image >= 4;
+if has_image then
+	local w, h = obj.w, obj.h;
+	local obj_props = { obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha };
+	obj.copybuffer("tempbuffer", "object");
+
+	obj.load("image", file_image);
+	if obj.w > 0 or obj.h > 0 then
+		obj.pixelshader("recol_img", "tempbuffer", { "tempbuffer", "object" }, {
+			math.floor((w - obj.w) / 2) + img_X + X, math.floor((h - obj.h) / 2) + img_Y + Y;
+			obj.w, obj.h;
+		});
+	else has_image = false end
+
+	obj.copybuffer("object", "tempbuffer");
+	obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha = unpack(obj_props);
+end
+if not has_image then
+	obj.copybuffer("tempbuffer", "object");
+	obj.pixelshader("recol_one", "object", "tempbuffer", {
+		bit.band(color, 0xff0000) / 0xff0000,
+		bit.band(color, 0x00ff00) / 0x00ff00,
+		bit.band(color, 0x0000ff) / 0x0000ff, 1
+	});
+end
+
+-- prepare the target to draw.
+obj.pixelshader("unalpha", "tempbuffer", cache_name);
+
+-- draw using the selected blend mode.
+obj.setoption("drawtarget", "tempbuffer");
+obj.setoption("blend", blend);
+obj.draw(0, 0, 0, 1, alpha);
+obj.setoption("blend", "none");
+obj.copybuffer("object", "tempbuffer");
+
+-- carve the image.
+obj.pixelshader("identity", "object", cache_name, nil, "mask");
