@@ -2,7 +2,8 @@
 
 汎用的な基本効果や基本図形などをまとめた AviUtl ExEdit2 用のスクリプト集です．丸角四角形の生成や斜め軸での回転，回転中心のマウス操作移動や傾斜変形，内側シャドウや内側縁取りなどができます．
 
-[ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Basic_S/releases) \[紹介動画準備中．\]
+[ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Basic_S/releases) [紹介動画．](https://www.nicovideo.jp/watch/sm45523651
+)
 
 ##  動作要件
 
