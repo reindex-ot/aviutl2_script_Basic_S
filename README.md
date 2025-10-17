@@ -40,17 +40,23 @@
 
 丸角の形状も複数種類から選べ，半径や縦横比も角ごとに独立に指定することもできます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/角丸矩形)
+
 ### 楕円
 
 <img width="320" height="240" alt="Sample of an ellipse shape" src="https://github.com/user-attachments/assets/3a2ace4b-c95f-45e6-ae4d-2564f4d60006" />
 
 標準図形の「円」を，縦横をピクセル単位で指定できるようにしたものです．上下左右揃えの指定もできます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/楕円)
+
 ### 菱形
 
 <img width="320" height="240" alt="Sample of a rhombus shape" src="https://github.com/user-attachments/assets/057750a3-5043-43c1-b9c6-6773f73c432f" />
 
 菱形を生成します．縦横をピクセル単位で指定でき，上下左右揃えの指定もできます．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/菱形)
 
 ### スーパー楕円
 
@@ -59,6 +65,8 @@
 [スーパー楕円](https://ja.wikipedia.org/wiki/スーパー楕円)を生成します．[アステロイド](https://ja.wikipedia.org/wiki/アステロイド_(曲線))や菱形などもこの特殊形です．
 
 縦横をピクセル単位で指定でき，上下左右揃えの指定もできます．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/スーパー楕円)
 
 ##  追加されるフィルタ効果
 
@@ -70,6 +78,8 @@
 
 角の形状も複数種類から選べ，半径や縦横比も角ごとに独立に指定することもできます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/四隅丸め)
+
 ### 背景角丸矩形
 
 <img width="360" height="120" alt="Sample of a round rect background" src="https://github.com/user-attachments/assets/d80d9d36-268e-4a56-a00a-39596c80e577" />
@@ -77,6 +87,8 @@
 オブジェクトの背景に角丸矩形を配置します．テロップバックや立ち絵の背景などに利用できます．
 
 色を指定する代わりにパターン画像を指定することもできます．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/背景角丸矩形)
 
 ### 背景楕円
 
@@ -86,6 +98,8 @@
 
 色を指定する代わりにパターン画像を指定することもできます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/背景楕円)
+
 ### 背景菱形
 
 <img width="560" height="120" alt="Sample of a rhombus background" src="https://github.com/user-attachments/assets/5e1999b9-dcd5-4751-8cec-c1d1712eae63" />
@@ -94,20 +108,26 @@
 
 色を指定する代わりにパターン画像を指定することもできます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/背景菱形)
+
 ### 透明度適用
 
-標準のフィルタ効果の「透明度」とは異なり，後続のフィルタ効果に影響する形で透明度を指定します．
+オブジェクトの各ピクセルを指定した分だけ半透明化します．標準のフィルタ効果の「透明度」とは異なり，後続のフィルタ効果に影響する形で透明度を指定します．
 
 > [!NOTE]
 > 標準のフィルタ効果の「透明度」の効果が適用されるのは最後にフレームバッファに描画されるタイミングで，全てのフィルタ効果が適用された後です．内部的な「後に適用される透明度の数値」を操作しているだけなので高速な反面，後続のフィルタ効果 (標準描画など以外) にはまず影響しません．
 >
 > 「縁取り」や「反転」の「透明度反転」など一部のフィルタ効果に対して，半透明化したピクセルを意図して処理させたい場合には「透明度適用」が効果的です．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/透明度適用)
+
 ### 透明度二値化
 
 透明度を二値化します．ぼかしの境界を明確にしたい場合などに利用できます．
 
-二値化の境界付近に「ぼかし幅」の設定もできます．
+正確には二値化ではなく，「一定のしきい値よりも透明なら完全透明，また別のしきい値よりも不透明なら完全不透明，その間は線形に補間」という処理を行います．従って半透明になる「ぼかし幅」があります．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/透明度二値化)
 
 ### 色調補正
 

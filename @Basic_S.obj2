@@ -70,7 +70,6 @@ local obj, math, tonumber, tostring, type, pairs, table, buffer = obj, math, ton
 		color:			number?,
 		color_back:		number?,
 		alpha_back:		number?,
-		alpha_front:	number?,
 		radii:			table|number|nil,
 		fixed_aspect:	boolean|number|nil,
 		shapes:			table|string|nil,
