@@ -1639,8 +1639,8 @@ obj.setanchor("axis_Y", 1, "star", "color", 0x208020);
 -- take parameters.
 --[==[
 	PI = {
-		stretch_X = stretch_X ~= 0;
-		stretch_Y = stretch_Y ~= 0;
+		stretch_X: boolean|number|nil,
+		stretch_Y: boolean|number|nil,
 	}
 ]==]
 local function as_bool(t, v)

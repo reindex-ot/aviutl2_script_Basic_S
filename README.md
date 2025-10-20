@@ -198,13 +198,17 @@ https://github.com/user-attachments/assets/8a0d6595-605f-49c5-9e05-739963d9c63a
 
 ![Demo of slant effect](https://github.com/user-attachments/assets/a9b55ccf-0dc7-4404-9624-cb3085424d21)
 
-アンカーで指定した軸に沿った傾斜変形をします．傾斜量は角度と傾き (角度の $\tan$ 値) で指定できます (両方指定した場合は，傾きとしての和を適用).
+アンカーで指定した軸に沿った傾斜変形をします．傾斜量は角度と傾き (角度の $\tan$ 値) で指定できます．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/傾斜)
 
 ### XY軸変形
 
 https://github.com/user-attachments/assets/146133cf-f82f-4bc9-82ff-5dfc1b7d86d8
 
 X, Y 軸方向に伸びたアンカーをマウス操作することで変形します．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/XY軸変形)
 
 ### 領域サイズ変更
 
@@ -214,17 +218,21 @@ X, Y 軸方向に伸びたアンカーをマウス操作することで変形し
 
 - [領域サイズ指定](#領域サイズ指定)と名前が似ているので注意．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/領域サイズ変更)
+
 ### 領域割合サイズ変更
 
-[領域サイズ変更](#領域サイズ変更)の割合指定版です．ピクセル数単位ではなく，左右の値はオブジェクトの幅からの割合で，上下の値はオブジェクトの高さからの割合でそれぞれ指定します．
+[領域サイズ変更](#領域サイズ変更)の割合指定版です．ピクセル数単位ではなくオブジェクトのサイズからの割合で指定します．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/領域割合サイズ変更)
 
 ### 領域サイズ指定
 
-指定した位置とサイズでオブジェクトをクリッピング，必要なら領域拡張をします．
-
-予め切り取りたいサイズがわかっている場合に，アンカー操作で位置を指定して切り抜きするなどに便利です．
+オブジェクトに対してクリッピングや領域拡張を適用して，指定した位置とサイズでオブジェクトを切り抜きます．予め切り取りたいサイズがわかっている場合に，アンカー操作で位置を指定してクリッピングするときなどに便利です．
 
 - [領域サイズ変更](#領域サイズ変更)と名前が似ているので注意．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/領域サイズ指定)
 
 ### カットずらし
 
