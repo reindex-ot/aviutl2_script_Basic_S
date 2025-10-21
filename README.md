@@ -27,8 +27,6 @@
 
 [Wiki](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki) に掲載しています．
 
-パラメタインジェクション (`PI`) 経由でのみ指定・調整できる項目もあります．
-
 ##  追加されるオブジェクト
 
 ### 角丸矩形
