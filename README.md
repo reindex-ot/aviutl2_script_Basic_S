@@ -2,8 +2,7 @@
 
 汎用的な基本効果や基本図形などをまとめた AviUtl ExEdit2 用のスクリプト集です．丸角四角形の生成や斜め軸での回転，回転中心のマウス操作移動や傾斜変形，内側シャドウや内側縁取りなどができます．
 
-[ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Basic_S/releases) [紹介動画．](https://www.nicovideo.jp/watch/sm45523651
-)
+[ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_Basic_S/releases) [紹介動画．](https://www.nicovideo.jp/watch/sm45523651)
 
 ##  動作要件
 
@@ -26,7 +25,7 @@
 
 ##  詳しい解説について
 
-[Wiki](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki) に順次掲載していく予定です．
+[Wiki](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki) に掲載しています．
 
 パラメタインジェクション (`PI`) 経由でのみ指定・調整できる項目もあります．
 
@@ -240,24 +239,34 @@ https://github.com/user-attachments/assets/6fc13047-fde8-4ec9-8984-2083661129f2
 
 アンカーで指定したラインでオブジェクトを切り取って，ずらして配置します．ずらす移動量や方向もアンカーで操作できます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/カットずらし)
+
 ### 中抜きクリッピング
 
 <img width="520" height="360" alt="Sample of midrange crop" src="https://github.com/user-attachments/assets/bce76075-2c82-40cc-919b-3a3442f09c8b" />
 
 「クリッピング」や「領域拡張」に相当する操作を，オブジェクトの端ではなく中間部分で行います．大きな図表の中間部分を切り取って詰めたい場合に利用できます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/中抜きクリッピング)
+
 ### 小数ぼかし
 
-標準の「ぼかし」とは異なり，小数点以下のピクセル数の精度で画像をぼかします．AviUtl 標準の「ぼかし」にあった，小さい奇数ピクセルでの不具合も修正しています．
+標準の「ぼかし」とは異なり，小数点以下のピクセル数の精度で画像をぼかします．
+
+AviUtl 標準の「ぼかし」にあった，小さい奇数ピクセルでの不具合も修正しています．
 
 > [!NOTE]
 > 標準の「ぼかし」には，奇数ピクセルを指定した場合の重み分布が正確な三角分布にはならない不具合があります．AviUtl (無印) でも同様の挙動です．
 >
 > 例えば 1 ピクセルのぼかしの場合，正確な三角分布は “25%, 50%, 25%” ですが，AviUtl 標準の「ぼかし」だと “33.3%, 33.3%, 33.3%” という分布になっています．3 ピクセルの場合だと，正確な分布 “6.25%, 12.5%, 18.75%, 25%, 18.75%, 12.5%, 6.25%” に対して “6.67%, 13.3%, 20%, 20%, 20%, 13.3%, 6.67%”.
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/小数ぼかし)
+
 ### 縁取りα
 
 標準の「縁取り」に透明度を指定したり，中をくり抜いて縁だけにしたり，内側縁取りもできるようになります．縁部分にパターン画像の指定も可能．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/縁取りα)
 
 ### 四角縁取り
 
@@ -267,22 +276,15 @@ AviUtl (無印) の「縁取り」と同様，角が四角になる縁取りで�
 
 [縁取りα](#縁取りα)と同様，透明度の指定や内側縁取りなども可能です．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/四角縁取り)
+
 ### 内側シャドウ
 
 <img width="280" height="280" alt="Sample of inner shadow effect" src="https://github.com/user-attachments/assets/e93b5e4f-a43e-416c-9341-db0b2df02950" />
 
 オブジェクト自身に外側から影が落ちているような効果を描画します．パターン画像や合成モードの指定もできます．
 
-##  既知の問題
-
-1.  [スーパー楕円](#スーパー楕円)のライン幅には標準の「縁取り」を利用していますが，これは 500 ピクセルサイズが限界のため，スーパー楕円のライン幅も最大で 500 ピクセルしか描画されません．
-
-1.  [スーパー楕円](#スーパー楕円)で「膨らみ」が小さい ($\lessapprox -150$) の場合，サイズが偶数ピクセルか奇数ピクセルかで尖点部分の見え方が大きく変わります．サイズを連続して動かす場合は，ちらつきの原因となるので注意．
-
-1.  [XYZ追加回転](#xyz追加回転)や[任意軸追加回転](#任意軸追加回転)で[「描画する」](#描画する)が ON の場合，オブジェクトが二重にグループ制御に入っている場合などでは，オブジェクトの描画位置が正確に取得できない場面があります．そのためズレた描画になることがあります．
-
-1.  [小数ぼかし](#小数ぼかし)の「光の強さ」の影響は，標準の「ぼかし」のものとは異なります．このスクリプトでは AviUtl (無印) のフィルタ効果の「ぼかし」での計算式を使用していますが，AviUtl2 での計算式とは異なるらしく，それが不明なため完全再現とはなっていません．
-
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/内側シャドウ)
 
 ## 改版履歴
 
