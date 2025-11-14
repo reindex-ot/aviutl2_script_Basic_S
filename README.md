@@ -288,9 +288,13 @@ AviUtl (無印) の「縁取り」と同様，角が四角になる縁取りで�
 
 AviUtl (無印) にあった「画像ファイル合成」と同等のことができます．無印版の機能に加えて画像の回転やアルファ値の指定，オブジェクトの範囲からはみ出しての合成などもできます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/画像ファイル合成)
+
 ### 動画ファイル合成
 
 AviUtl (無印) にあった「動画ファイル合成」と同等のことができます．[画像ファイル合成](#画像ファイル合成)の動画ファイル版です．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/動画ファイル合成)
 
 ## 改版履歴
 
