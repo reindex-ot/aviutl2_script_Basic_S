@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @角丸矩形
---information:角丸矩形@Basic_S v1.10 (for beta19a) by σ軸
+--information:角丸矩形@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
@@ -34,12 +34,12 @@ https://mit-license.org/
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
 --track@radius:角半径,0,2000,40,0.01
---check@uniform:半径均一,1
+--check@uniform:半径均一,true
 --track@r_RT:右上半径,0,2000,40,0.01
 --track@r_RB:右下半径,0,2000,40,0.01
 --track@r_LB:左下半径,0,2000,40,0.01
 --track@aspect:丸角縦横比,-100,100,0,0.001
---check@fixed_aspect:丸角縦横比固定,1
+--check@fixed_aspect:丸角縦横比固定,true
 --select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
 --value@PI:PI,{}
 --[[pixelshader@combine:
@@ -57,7 +57,7 @@ float4 combine(float4 pos : SV_Position) : SV_Target
 	return col_chm + col_bkg;
 }
 ]]
-local obj, math, tonumber, tostring, type, pairs, table, buffer = obj, math, tonumber, tostring, type, pairs, table, require("string.buffer");
+local obj, math, tonumber, type, buffer = obj, math, tonumber, type, require("string.buffer");
 
 -- take parameters.
 --[==[
@@ -88,7 +88,7 @@ line = tonumber(PI.line) or line;
 color = tonumber(PI.color) or color;
 color_back = tonumber(PI.color_back) or color_back;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
-fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect ~= 0) and 1 or 0;
+fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect) and 1 or 0;
 
 -- normalize parameters.
 width = math.max(math.floor(0.5 + width), 0);
@@ -128,7 +128,7 @@ local pi_head = ("radii=require'string.buffer'.decode%s,shapes=require'string.bu
 if do_fill or alpha_back > 0 then
 	obj.clearbuffer("object", do_fill and color or color_back);
 	obj.effect("四隅丸め@Basic_S", "半径", radius,
-		"半径均一", uniform, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
+		"半径均一", uniform and 1 or 0, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
 		"縦横比", aspect, "縦横比固定", fixed_aspect, "形状", shape_name, "PI",
 		pi_head..math.max(width, height, 4000));
 	if do_fill then return end
@@ -145,7 +145,7 @@ end
 if line > 0 then
 	obj.clearbuffer("object", color);
 	obj.effect("四隅丸め@Basic_S", "半径", radius,
-		"半径均一", uniform, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
+		"半径均一", uniform and 1 or 0, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
 		"縦横比", aspect, "縦横比固定", fixed_aspect, "形状", shape_name, "PI",
 		pi_head..line);
 else obj.clearbuffer("object") end
@@ -156,7 +156,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @楕円
---information:楕円@Basic_S v1.10 (for beta19a) by σ軸
+--information:楕円@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
@@ -166,7 +166,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
---check@circle:真円,0
+--check@circle:真円,false
 --value@PI:PI,{}
 --[[pixelshader@combine:
 Texture2D chm : register(t0);
@@ -212,7 +212,7 @@ line = tonumber(PI.line) or line;
 color = tonumber(PI.color) or color;
 color_back = tonumber(PI.color_back) or color_back;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
-circle = as_bool(PI.circle, circle ~= 0);
+circle = as_bool(PI.circle, circle);
 
 -- normalize parameters.
 width = math.max(math.floor(0.5 + width), 0);
@@ -263,7 +263,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @菱形
---information:菱形@Basic_S v1.10 (for beta19a) by σ軸
+--information:菱形@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
@@ -273,7 +273,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
---check@square:正方形,0
+--check@square:正方形,false
 --value@PI:PI,{}
 --[[pixelshader@combine:
 Texture2D chm : register(t0);
@@ -319,7 +319,7 @@ line = tonumber(PI.line) or line;
 color = tonumber(PI.color) or color;
 color_back = tonumber(PI.color_back) or color_back;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
-square = as_bool(PI.square, square ~= 0);
+square = as_bool(PI.square, square);
 
 -- normalize parameters.
 width = math.max(math.floor(0.5 + width), 0);
@@ -370,7 +370,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @スーパー楕円
---information:スーパー楕円@Basic_S v1.10 (for beta19a) by σ軸
+--information:スーパー楕円@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\図形
 --track@exponent:膨らみ,-300,300,-60,0.001
 --track@width:幅,0,4000,100,1
@@ -381,7 +381,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
---check@symmetric:縦横一致,0
+--check@symmetric:縦横一致,false
 --value@PI:PI,{}
 --[[pixelshader@carve:
 cbuffer constant0 : register(b0) {
@@ -427,7 +427,7 @@ line = tonumber(PI.line) or line;
 color = tonumber(PI.color) or color;
 color_back = tonumber(PI.color_back) or color_back;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
-symmetric = as_bool(PI.symmetric, symmetric ~= 0);
+symmetric = as_bool(PI.symmetric, symmetric);
 
 -- normalize parameters.
 exponent = math.min(math.max(exponent / 100, -3), 3);

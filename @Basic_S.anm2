@@ -23,15 +23,15 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @四隅丸め
---information:四隅丸め@Basic_S v1.10 (for beta19a) by σ軸
+--information:四隅丸め@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track@radius:半径,0,2000,40,0.01
---check@uniform:半径均一,1
+--check@uniform:半径均一,true
 --track@r_RT:右上半径,0,2000,40,0.01
 --track@r_RB:右下半径,0,2000,40,0.01
 --track@r_LB:左下半径,0,2000,40,0.01
 --track@aspect:縦横比,-100,100,0,0.001
---check@fixed_aspect:縦横比固定,1
+--check@fixed_aspect:縦横比固定,true
 --select@shape:形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
 --track@line:ライン幅,0,4000,4000,0.01
 --value@PI:PI,{}
@@ -162,7 +162,6 @@ local function apply_aspect(r, a)
 	return math.min(1 - a, 1) * r, math.min(1 + a, 1) * r;
 end
 radius = math.max(radius, 0);
-uniform = uniform ~= 0;
 aspect = math.min(math.max(aspect / 100, -1), 1);
 local radii, shapes = {
 	{ apply_aspect(radius, aspect) },
@@ -205,7 +204,7 @@ elseif type(PI.radii) == "table" then
 		if x then radii[i] = { x, y } end
 	end
 end
-fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect ~= 0);
+fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect);
 if PI.shapes then
 	local name2num = {
 		["円"] = 0, ["円(凹)"] = 1, ["菱形"] = 2, ["四角形(凹)"] = 3,
@@ -280,7 +279,7 @@ obj.pixelshader("carve", "object", nil, {
 }, "mask");
 
 @背景角丸矩形
---information:背景角丸矩形@Basic_S v1.10 (for beta19a) by σ軸
+--information:背景角丸矩形@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -294,12 +293,12 @@ obj.pixelshader("carve", "object", nil, {
 --track@alpha_back:背景透明度,0,100,100,0.01
 --track@alpha_front:前景透明度,0,100,0,0.01
 --track@radius:角半径,0,2000,40,0.01
---check@uniform:半径均一,1
+--check@uniform:半径均一,true
 --track@r_RT:右上半径,0,2000,40,0.01
 --track@r_RB:右下半径,0,2000,40,0.01
 --track@r_LB:左下半径,0,2000,40,0.01
 --track@aspect:丸角縦横比,-100,100,0,0.001
---check@fixed_aspect:丸角縦横比固定,1
+--check@fixed_aspect:丸角縦横比固定,true
 --select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
 --value@PI:PI,{}
 --[[pixelshader@combine:
@@ -427,7 +426,7 @@ file_back = type(PI.file_back) == "string" and PI.file_back or file_back;
 local back_x, back_y = tonumber(PI.back_x) or 0, tonumber(PI.back_y) or 0;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
 alpha_front = tonumber(PI.alpha_front) or alpha_front;
-fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect ~= 0) and 1 or 0;
+fixed_aspect = as_bool(PI.fixed_aspect, fixed_aspect) and 1 or 0;
 
 -- normalize parameters.
 pad_L = math.floor(0.5 + pad_L);
@@ -538,7 +537,7 @@ else
 	if do_fill or clip > 0 or alpha_back > 0 then
 		obj.clearbuffer("object", color);
 		obj.effect("四隅丸め@Basic_S", "半径", radius,
-			"半径均一", uniform, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
+			"半径均一", uniform and 1 or 0, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
 			"縦横比", aspect, "縦横比固定", fixed_aspect, "形状", shape_name, "PI",
 			pi_head..math.max(W, H, 4000));
 		obj.copybuffer("tempbuffer", "object");
@@ -548,7 +547,7 @@ else
 	if not do_fill then
 		obj.clearbuffer("object", color);
 		obj.effect("四隅丸め@Basic_S", "半径", radius,
-			"半径均一", uniform, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
+			"半径均一", uniform and 1 or 0, "右上半径", r_RT, "右下半径", r_RB, "左下半径", r_LB,
 			"縦横比", aspect, "縦横比固定", fixed_aspect, "形状", shape_name, "PI",
 			pi_head..line);
 	end
@@ -581,7 +580,7 @@ end
 obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
 
 @背景楕円
---information:背景楕円@Basic_S v1.10 (for beta19a) by σ軸
+--information:背景楕円@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -594,8 +593,8 @@ obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
 --file@file_back:背景パターン画像
 --track@alpha_back:背景透明度,0,100,100,0.01
 --track@alpha_front:前景透明度,0,100,0,0.01
---check@inclusive:包含,1
---check@circle:真円,0
+--check@inclusive:包含,true
+--check@circle:真円,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -650,8 +649,8 @@ file_back = type(PI.file_back) == "string" and PI.file_back or file_back;
 local back_x, back_y = tonumber(PI.back_x) or 0, tonumber(PI.back_y) or 0;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
 alpha_front = tonumber(PI.alpha_front) or alpha_front;
-inclusive = as_bool(PI.inclusive, inclusive ~= 0);
-circle = as_bool(PI.circle, circle ~= 0);
+inclusive = as_bool(PI.inclusive, inclusive);
+circle = as_bool(PI.circle, circle);
 
 -- normalize parameters.
 pad_L = math.floor(0.5 + pad_L);
@@ -692,7 +691,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @背景菱形
---information:背景菱形@Basic_S v1.10 (for beta19a) by σ軸
+--information:背景菱形@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -705,8 +704,8 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 --file@file_back:背景パターン画像
 --track@alpha_back:背景透明度,0,100,100,0.01
 --track@alpha_front:前景透明度,0,100,0,0.01
---check@inclusive:包含,1
---check@square:正方形,0
+--check@inclusive:包含,true
+--check@square:正方形,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -761,8 +760,8 @@ file_back = type(PI.file_back) == "string" and PI.file_back or file_back;
 local back_x, back_y = tonumber(PI.back_x) or 0, tonumber(PI.back_y) or 0;
 alpha_back = tonumber(PI.alpha_back) or alpha_back;
 alpha_front = tonumber(PI.alpha_front) or alpha_front;
-inclusive = as_bool(PI.inclusive, inclusive ~= 0);
-square = as_bool(PI.square, square ~= 0);
+inclusive = as_bool(PI.inclusive, inclusive);
+square = as_bool(PI.square, square);
 
 -- normalize parameters.
 pad_L = math.floor(0.5 + pad_L);
@@ -806,10 +805,10 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @透明度適用
---information:透明度適用@Basic_S v1.10 (for beta19a) by σ軸
+--information:透明度適用@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\加工
 --track@alpha:透明度,-100,100,0,0.01
---check@apply_former:累積分も適用,0
+--check@apply_former:累積分も適用,false
 --[[pixelshader@const_alpha:
 cbuffer constant0 : register(b0) {
 	float alpha;
@@ -821,11 +820,11 @@ float4 const_alpha(float4 pos : SV_Position) : SV_Target
 ]]
 local obj, math = obj, math;
 alpha = math.min(math.max(1 - alpha / 100, 0), 2);
-if apply_former ~= 0 then obj.alpha, alpha = 1, alpha * obj.alpha end
+if apply_former then obj.alpha, alpha = 1, alpha * obj.alpha end
 if alpha ~= 1 then obj.pixelshader("const_alpha", "object", nil, { alpha }, "mask") end
 
 @透明度二値化
---information:透明度二値化@Basic_S v1.10 (for beta19a) by σ軸
+--information:透明度二値化@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\加工
 --track@alpha:基準透明度,0,100,50,0.01
 --track@buffer:ぼかし幅,0,100,8,0.01
@@ -865,15 +864,15 @@ if alpha > 0 or buffer < 1 then
 end
 
 @色調補正
---information:色調補正@Basic_S v1.10 (for beta19a) by σ軸
+--information:色調補正@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\色調整
 --track@add_light:明るさ,0,200,100,0.01
 --track@contrast:コントラスト,0,200,100,0.01
 --track@angle:色相,-720,720,0,0.01
 --track@mul_light:輝度,0,200,100,0.01
---check@rev_light:輝度反転,0
+--check@rev_light:輝度反転,false
 --track@mul_sat:彩度,0,200,100,0.01
---check@saturate:飽和する,0
+--check@saturate:飽和する,false
 --select@space:色空間=4,XYZ(sRGB)=0,YUV(BT.601)=1,YUV(BT.709)=2,YUV(BT.2020)=3,HSV(円柱)=4,HSV(円錐)=5,HSL(円柱)=6,HSL(双円錐)=7
 --value@PI:PI,{}
 --[[pixelshader@by_xyz:
@@ -994,9 +993,9 @@ add_light = tonumber(PI.add_light) or add_light;
 contrast = tonumber(PI.contrast) or contrast;
 angle = tonumber(PI.angle) or angle;
 mul_light = tonumber(PI.mul_light) or mul_light;
-rev_light = as_bool(PI.rev_light, rev_light ~= 0);
+rev_light = as_bool(PI.rev_light, rev_light);
 mul_sat = tonumber(PI.mul_sat) or mul_sat;
-saturate = as_bool(PI.saturate, saturate ~= 0);
+saturate = as_bool(PI.saturate, saturate);
 if type(PI.space) == "string" then
 	space = ({
 		["XYZ(sRGB)"] = 0, ["YUV(BT.601)"] = 1, ["YUV(BT.709)"] = 2, ["YUV(BT.2020)"] = 3,
@@ -1104,7 +1103,7 @@ else
 end
 
 @回転中心
---information:回転中心@Basic_S v1.10 (for beta19a) by σ軸
+--information:回転中心@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@X:X,-4000,4000,0,0.01
 --track@Y:Y,-4000,4000,0,0.01
@@ -1114,7 +1113,7 @@ obj.cy = obj.cy + Y;
 obj.cz = obj.cz + Z;
 
 @回転中心アンカー指定
---information:回転中心アンカー指定@Basic_S v1.10 (for beta19a) by σ軸
+--information:回転中心アンカー指定@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
@@ -1163,37 +1162,36 @@ obj.ox,	obj.oy,	obj.oz = obj.ox + dx, obj.oy + dy, obj.oz + dz;
 obj.cx,obj.cy,obj.cz = cx, cy, cz;
 
 @上下左右揃え
---information:上下左右揃え@Basic_S v1.10 (for beta19a) by σ軸
+--information:上下左右揃え@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@X:左右%,-100,100,0,0.001
 --track@Y:上下%,-100,100,0,0.001
---check@x_enabled:左右有効,1
---check@y_enabled:上下有効,1
---check@fix_pos:描画位置を固定,0
+--check@x_enabled:左右有効,true
+--check@y_enabled:上下有効,true
+--check@fix_pos:描画位置を固定,false
 local obj=obj;
 local cx, cy = obj.cx, obj.cy;
-if x_enabled ~= 0 then
+if x_enabled then
 	cx = (X / 100) * obj.w / 2 - obj.getvalue("cx");
 end
-if y_enabled ~= 0 then
+if y_enabled then
 	cy = (Y / 100) * obj.h / 2 - obj.getvalue("cy");
 end
 if cx ~= obj.cx or cy ~= obj.cy then
-	if fix_pos ~= 0 then
+	if fix_pos then
 		obj.effect("回転中心アンカー指定@Basic_S", "PI", "X="..cx..",Y=".. cy);
 	else obj.cx, obj.cy = cx, cy end
 end
 
 @直角回転
---information:直角回転@Basic_S v1.10 (for beta19a) by σ軸
+--information:直角回転@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\配置
 --select@rot:方向=0,なし=0,90°時計回り=1,180°反転=2,90°反時計回り=3,左右反転=4,上下反転=5,右上軸反転=6,左上軸反転=7
---check@move_center:中心の位置を変更,0
+--check@move_center:中心の位置を変更,false
 local obj, math = obj, math;
 
 rot = math.min(math.max(math.floor(0.5 + rot), 0), 7);
 if rot == 0 then return end
-move_center = move_center ~= 0;
 
 local w, h, cx0, cy0 = obj.w, obj.h, obj.cx + obj.getvalue("cx"), obj.cy + obj.getvalue("cy");
 local cx, cy = cx0, cy0;
@@ -1233,14 +1231,14 @@ obj.copybuffer("object", "tempbuffer");
 if not move_center then obj.cx, obj.cy = obj.cx + (cx - cx0), obj.cy + (cy - cy0) end
 
 @XYZ追加回転
---information:XYZ追加回転@Basic_S v1.10 (for beta19a) by σ軸
+--information:XYZ追加回転@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@X:X,-720,720,0,0.01
 --track@Y:Y,-720,720,0,0.01
 --track@Z:Z,-720,720,0,0.01
 --track@intensity:回転量,-200,200,100,0.01
---check@draw:描画する,0
---check@grouped:グループ制御,0
+--check@draw:描画する,false
+--check@grouped:グループ制御,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1264,8 +1262,8 @@ X = tonumber(PI.X) or X;
 Y = tonumber(PI.Y) or Y;
 Z = tonumber(PI.Z) or Z;
 intensity = tonumber(PI.intensity) or intensity;
-draw = as_bool(PI.draw, draw ~= 0);
-grouped = as_bool(PI.grouped, grouped ~= 0);
+draw = as_bool(PI.draw, draw);
+grouped = as_bool(PI.grouped, grouped);
 
 -- normalize parameters.
 X = math.pi / 180 * (X % 360);
@@ -1300,14 +1298,14 @@ if angle ~= 0 or draw then
 end
 
 @任意軸追加回転
---information:任意軸追加回転@Basic_S v1.10 (for beta19a) by σ軸
+--information:任意軸追加回転@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@angle:角度,-720,720,0,0.01
 --track0:回転軸X,-512,512,0,0.001
 --track1:回転軸Y,-512,512,0,0.001
 --track2:回転軸Z,-512,512,128,0.001
---check@draw:描画する,0
---check@grouped:グループ制御,0
+--check@draw:描画する,false
+--check@grouped:グループ制御,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1348,8 +1346,8 @@ angle = tonumber(PI.angle) or angle;
 X = tonumber(PI.X) or X;
 Y = tonumber(PI.Y) or Y;
 Z = tonumber(PI.Z) or Z;
-draw = as_bool(PI.draw, draw ~= 0);
-grouped = as_bool(PI.grouped, grouped ~= 0);
+draw = as_bool(PI.draw, draw);
+grouped = as_bool(PI.grouped, grouped);
 local fix_axis = as_bool(PI.fix_axis, false);
 
 -- normalize parameters.
@@ -1545,7 +1543,7 @@ else
 end
 
 @傾斜
---information:傾斜@Basic_S v1.10 (for beta19a) by σ軸
+--information:傾斜@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\変形
 --track@angle:角度,-80,80,0,0.001
 --track@slope:傾き%,-500,500,0,0.001
@@ -1623,12 +1621,12 @@ obj.copybuffer("object", "tempbuffer");
 obj.cx, obj.cy = obj.cx - cx, obj.cy - cy;
 
 @XY軸変形
---information:XY軸変形@Basic_S v1.10 (for beta19a) by σ軸
+--information:XY軸変形@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\変形
 --value@axis_X:X軸,{100,0}
---check@stretch_X:X長さ変更,0
+--check@stretch_X:X長さ変更,false
 --value@axis_Y:Y軸,{0,-100}
---check@stretch_Y:Y長さ変更,0
+--check@stretch_Y:Y長さ変更,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1648,8 +1646,8 @@ local function as_bool(t, v)
 	elseif type(t) == "number" then return t ~= 0;
 	else return v end
 end
-stretch_X = as_bool(PI.stretch_X, stretch_X ~= 0);
-stretch_Y = as_bool(PI.stretch_Y, stretch_Y ~= 0);
+stretch_X = as_bool(PI.stretch_X, stretch_X);
+stretch_Y = as_bool(PI.stretch_Y, stretch_Y);
 
 -- normalize parameters.
 local xX, yX, xY, yY =
@@ -1678,14 +1676,14 @@ obj.drawpoly(
 obj.copybuffer("object", "tempbuffer");
 
 @領域サイズ変更
---information:領域サイズ変更@Basic_S v1.10 (for beta19a) by σ軸
+--information:領域サイズ変更@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上,-4000,4000,0,1
 --track@B:下,-4000,4000,0,1
 --track@L:左,-4000,4000,0,1
 --track@R:右,-4000,4000,0,1
---check@move_center:中心の位置を変更,0
---check@fill_blank:塗りつぶし,0
+--check@move_center:中心の位置を変更,false
+--check@fill_blank:塗りつぶし,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1709,8 +1707,8 @@ T = tonumber(PI.T) or T;
 B = tonumber(PI.B) or B;
 L = tonumber(PI.L) or L;
 R = tonumber(PI.R) or R;
-move_center = as_bool(PI.move_center, move_center ~= 0);
-fill_blank = as_bool(PI.fill_blank, fill_blank ~= 0);
+move_center = as_bool(PI.move_center, move_center);
+fill_blank = as_bool(PI.fill_blank, fill_blank);
 
 -- normalize parameters.
 T = math.floor(0.5 + T);
@@ -1765,14 +1763,14 @@ end
 obj.cx, obj.cy = cx, cy;
 
 @領域割合サイズ変更
---information:領域割合サイズ変更@Basic_S v1.10 (for beta19a) by σ軸
+--information:領域割合サイズ変更@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上%,-100,100,0,0.001
 --track@B:下%,-100,100,0,0.001
 --track@L:左%,-100,100,0,0.001
 --track@R:右%,-100,100,0,0.001
---check@move_center:中心の位置を変更,0
---check@fill_blank:塗りつぶし,0
+--check@move_center:中心の位置を変更,false
+--check@fill_blank:塗りつぶし,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1796,8 +1794,8 @@ T = tonumber(PI.T) or T;
 B = tonumber(PI.B) or B;
 L = tonumber(PI.L) or L;
 R = tonumber(PI.R) or R;
-move_center = as_bool(PI.move_center, move_center ~= 0);
-fill_blank = as_bool(PI.fill_blank, fill_blank ~= 0);
+move_center = as_bool(PI.move_center, move_center);
+fill_blank = as_bool(PI.fill_blank, fill_blank);
 
 -- normalize parameters.
 T = math.min(math.max(T / 100, -1), 1);
@@ -1819,24 +1817,24 @@ if L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @領域サイズ指定
---information:領域サイズ指定@Basic_S v1.10 (for beta19a) by σ軸
+--information:領域サイズ指定@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
 --track@width:幅,1,4000,256,1
 --track@align_x:水平揃え,-100,100,0,0.001
---check@x_enabled:幅指定有効,1
+--check@x_enabled:幅指定有効,true
 --track@height:高さ,1,4000,256,1
 --track@align_y:垂直揃え,-100,100,0,0.001
---check@y_enabled:高さ指定有効,1
---check@move_center:中心の位置を変更,0
---check@fill_blank:塗りつぶし,0
---check@inverted_mask:反転マスク,0
+--check@y_enabled:高さ指定有効,true
+--check@move_center:中心の位置を変更,false
+--check@fill_blank:塗りつぶし,false
+--check@inverted_mask:反転マスク,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
 -- set anchors.
-if move_center == 0 then obj.setanchor("track", 0, "line") end
+if not move_center then obj.setanchor("track", 0, "line") end
 
 -- take parameters.
 --[==[
@@ -1864,13 +1862,13 @@ local X, Y =
 	tonumber(PI.Y) or obj.track1;
 width = tonumber(PI.width) or width;
 align_x = tonumber(PI.align_x) or align_x;
-x_enabled = as_bool(PI.x_enabled, x_enabled ~= 0);
+x_enabled = as_bool(PI.x_enabled, x_enabled);
 height = tonumber(PI.height) or height;
 align_y = tonumber(PI.align_y) or align_y;
-y_enabled = as_bool(PI.y_enabled, y_enabled ~= 0);
-move_center = as_bool(PI.move_center, move_center ~= 0);
-fill_blank = as_bool(PI.fill_blank, fill_blank ~= 0);
-inverted_mask = as_bool(PI.inverted_mask, inverted_mask ~= 0);
+y_enabled = as_bool(PI.y_enabled, y_enabled);
+move_center = as_bool(PI.move_center, move_center);
+fill_blank = as_bool(PI.fill_blank, fill_blank);
+inverted_mask = as_bool(PI.inverted_mask, inverted_mask);
 
 -- normalize parameters.
 width = math.max(math.floor(0.5 + width), 1);
@@ -1913,7 +1911,7 @@ elseif L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @カットずらし
---information:カットずらし@Basic_S v1.10 (for beta19a) by σ軸
+--information:カットずらし@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track0:ずれX,-4000,4000,40,1
 --track1:ずれY,-4000,4000,0,1
@@ -1921,7 +1919,7 @@ end
 --track@crop:切り取り幅,-4000,4000,0,0.01
 --select@mode_padding:余白処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
 --select@mode_overlap:重複処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
---check@move_center:中心の位置を変更,0
+--check@move_center:中心の位置を変更,false
 --value@PI:PI,{}
 --[[pixelshader@place:
 Texture2D src : register(t0);
@@ -1961,7 +1959,7 @@ float4 place(float4 pos : SV_Position) : SV_Target
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
 -- set anchors.
-if move_center == 0 then
+if not move_center then
 	obj.setanchor("track", 0, "arm");
 	obj.setanchor("crack", 2, "line", "color", 0x4040ff);
 end
@@ -1998,7 +1996,7 @@ do local name2num = { ["空白"] = 0, ["半透明"] = 1, ["補間"] = 2, ["引�
 	if type(PI.mode_padding) == "string" then mode_padding = name2num[PI.mode_padding] or mode_padding end
 	if type(PI.mode_overlap) == "string" then mode_overlap = name2num[PI.mode_overlap] or mode_overlap end
 end
-move_center = as_bool(PI.move_center, move_center ~= 0);
+move_center = as_bool(PI.move_center, move_center);
 
 -- normalize parameters.
 X = math.floor(0.5 + X);
@@ -2122,7 +2120,7 @@ if not move_center then
 end
 
 @中抜きクリッピング
---information:中抜きクリッピング@Basic_S v1.10 (for beta19a) by σ軸
+--information:中抜きクリッピング@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -2134,12 +2132,12 @@ end
 --track@gap_y:余白高さ,-4000,4000,0,1
 --select@mode_padding:余白処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
 --select@mode_overlap:重複処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
---check@move_center:中心の位置を変更,0
+--check@move_center:中心の位置を変更,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
 -- set anchors
-if move_center == 0 then
+if not move_center then
 	obj.setanchor("track", 0, "line");
 end
 
@@ -2177,7 +2175,7 @@ do local name2num = { ["空白"] = 0, ["半透明"] = 1, ["補間"] = 2, ["引�
 	if type(PI.mode_padding) == "string" then mode_padding = name2num[PI.mode_padding] or mode_padding end
 	if type(PI.mode_overlap) == "string" then mode_overlap = name2num[PI.mode_overlap] or mode_overlap end
 end
-move_center = as_bool(PI.move_center, move_center ~= 0);
+move_center = as_bool(PI.move_center, move_center);
 
 -- normalize parameters.
 width = math.floor(0.5 + width);
@@ -2222,12 +2220,12 @@ else
 end
 
 @小数ぼかし
---information:小数ぼかし@Basic_S v1.10 (for beta19a) by σ軸
+--information:小数ぼかし@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\ぼかし
 --track@range:範囲,0,1000,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
 --track@luma_weight:光の強さ,0,60,0,0.1
---check@fixed_size:サイズ固定,0
+--check@fixed_size:サイズ固定,false
 --value@PI:PI,{}
 --[[pixelshader@convol:
 Texture2D src : register(t0);
@@ -2319,7 +2317,7 @@ end
 range = tonumber(PI.range) or range;
 aspect = tonumber(PI.aspect) or aspect;
 luma_weight = tonumber(PI.luma_weight) or luma_weight;
-fixed_size = as_bool(PI.fixed_size, fixed_size ~= 0);
+fixed_size = as_bool(PI.fixed_size, fixed_size);
 
 -- normalize parameters.
 range = math.min(math.max(range, 0), 1000);
@@ -2365,7 +2363,7 @@ if luma_weight > 0 then
 end
 
 @縁取りα
---information:縁取りα@Basic_S v1.10 (for beta19a) by σ軸
+--information:縁取りα@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,1
 --track@blur:ぼかし,0,100,5,1
@@ -2542,7 +2540,7 @@ elseif alpha_front > 0 then
 end
 
 @四角縁取り
---information:四角縁取り@Basic_S v1.10 (for beta19a) by σ軸
+--information:四角縁取り@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2784,7 +2782,7 @@ else
 end
 
 @内側シャドウ
---information:内側シャドウ@Basic_S v1.10 (for beta19a) by σ軸
+--information:内側シャドウ@Basic_S v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@X:X,-1000,1000,-40,0.01
 --track@Y:Y,-1000,1000,24,0.01
@@ -2942,7 +2940,7 @@ obj.copybuffer("object", "tempbuffer");
 obj.pixelshader("identity", "object", cache_name, nil, "mask");
 
 @画像ファイル合成
---information:画像ファイル合成 v1.10 (for beta19a) by σ軸
+--information:画像ファイル合成 v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\加工
 --file@file:画像ファイル
 --track0:X,-4000,4000,0,0.01
@@ -2950,8 +2948,8 @@ obj.pixelshader("identity", "object", cache_name, nil, "mask");
 --track@zoom:拡大率,0,5000,100,0.001
 --track@rotate:回転,-720,720,0,0.01
 --track@alpha:透明度,0,100,0,0.01
---check@no_smooth:補間なし,0
---check@fixed_size:サイズ固定,0
+--check@no_smooth:補間なし,false
+--check@fixed_size:サイズ固定,false
 --select@mode_tile:画像ループ=0,なし=0,横=1,縦=2,縦横=3
 --select@mode_draw:モード=0,前方から合成=0,後方から合成=1,アルファ値を乗算=2,色情報を上書き=3,輝度をアルファ値として上書き=4,輝度をアルファ値として乗算=5
 --select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
@@ -3071,8 +3069,8 @@ local X, Y = tonumber(PI.X) or obj.track0, tonumber(PI.Y) or obj.track1;
 zoom = tonumber(PI.zoom) or zoom;
 rotate = tonumber(PI.rotate) or rotate;
 alpha = tonumber(PI.alpha) or alpha;
-no_smooth = as_bool(PI.no_smooth, no_smooth ~= 0);
-fixed_size = as_bool(PI.fixed_size, fixed_size ~= 0);
+no_smooth = as_bool(PI.no_smooth, no_smooth);
+fixed_size = as_bool(PI.fixed_size, fixed_size);
 if type(PI.mode_tile) == "string" then
 	local name2num = {
 		["なし"] = 0, ["横"] = 1, ["縦"] = 2, ["縦横"] = 3,
@@ -3208,19 +3206,19 @@ obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom
 obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
 
 @動画ファイル合成
---information:動画ファイル合成 v1.10 (for beta19a) by σ軸
+--information:動画ファイル合成 v1.11-beta1 (for beta19a) by σ軸
 --label:Basic_S\加工
 --file@file:動画ファイル
 --track@start:再生開始秒,0,3600,0,0.001
 --track@rate:再生速度,-2000,2000,100,0.001
---check@loop:ループ再生,0
+--check@loop:ループ再生,false
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
 --track@zoom:拡大率,0,5000,100,0.001
 --track@rotate:回転,-720,720,0,0.01
 --track@alpha:透明度,0,100,0,0.01
---check@no_smooth:補間なし,0
---check@fixed_size:サイズ固定,0
+--check@no_smooth:補間なし,false
+--check@fixed_size:サイズ固定,false
 --select@mode_tile:画像ループ=0,なし=0,横=1,縦=2,縦横=3
 --select@mode_draw:モード=0,前方から合成=0,後方から合成=1,アルファ値を乗算=2,色情報を上書き=3,輝度をアルファ値として上書き=4,輝度をアルファ値として乗算=5
 --select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
@@ -3341,13 +3339,13 @@ end
 file = type(PI.file) == "string" and PI.file or file;
 start = tonumber(PI.start) or start;
 rate = tonumber(PI.rate) or rate;
-loop = as_bool(PI.loop, loop ~= 0);
+loop = as_bool(PI.loop, loop);
 local X, Y = tonumber(PI.X) or obj.track0, tonumber(PI.Y) or obj.track1;
 zoom = tonumber(PI.zoom) or zoom;
 rotate = tonumber(PI.rotate) or rotate;
 alpha = tonumber(PI.alpha) or alpha;
-no_smooth = as_bool(PI.no_smooth, no_smooth ~= 0);
-fixed_size = as_bool(PI.fixed_size, fixed_size ~= 0);
+no_smooth = as_bool(PI.no_smooth, no_smooth);
+fixed_size = as_bool(PI.fixed_size, fixed_size);
 if type(PI.mode_tile) == "string" then
 	local name2num = {
 		["なし"] = 0, ["横"] = 1, ["縦"] = 2, ["縦横"] = 3,
