@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @四隅丸め
---information:四隅丸め@Basic_S v1.00 (for beta15) by σ軸
+--information:四隅丸め@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track@radius:半径,0,2000,40,0.01
 --check@uniform:半径均一,1
@@ -280,7 +280,7 @@ obj.pixelshader("carve", "object", nil, {
 }, "mask");
 
 @背景角丸矩形
---information:背景角丸矩形@Basic_S v1.00 (for beta15) by σ軸
+--information:背景角丸矩形@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -581,7 +581,7 @@ end
 obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
 
 @背景楕円
---information:背景楕円@Basic_S v1.00 (for beta15) by σ軸
+--information:背景楕円@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -692,7 +692,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @背景菱形
---information:背景菱形@Basic_S v1.00 (for beta15) by σ軸
+--information:背景菱形@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -806,7 +806,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @透明度適用
---information:透明度適用@Basic_S v1.00 (for beta15) by σ軸
+--information:透明度適用@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\加工
 --track@alpha:透明度,-100,100,0,0.01
 --check@apply_former:累積分も適用,0
@@ -825,7 +825,7 @@ if apply_former ~= 0 then obj.alpha, alpha = 1, alpha * obj.alpha end
 if alpha ~= 1 then obj.pixelshader("const_alpha", "object", nil, { alpha }, "mask") end
 
 @透明度二値化
---information:透明度二値化@Basic_S v1.00 (for beta15) by σ軸
+--information:透明度二値化@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\加工
 --track@alpha:基準透明度,0,100,50,0.01
 --track@buffer:ぼかし幅,0,100,8,0.01
@@ -865,7 +865,7 @@ if alpha > 0 or buffer < 1 then
 end
 
 @色調補正
---information:色調補正@Basic_S v1.00 (for beta15) by σ軸
+--information:色調補正@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\色調整
 --track@add_light:明るさ,0,200,100,0.01
 --track@contrast:コントラスト,0,200,100,0.01
@@ -1104,7 +1104,7 @@ else
 end
 
 @回転中心
---information:回転中心@Basic_S v1.00 (for beta15) by σ軸
+--information:回転中心@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@X:X,-4000,4000,0,0.01
 --track@Y:Y,-4000,4000,0,0.01
@@ -1114,7 +1114,7 @@ obj.cy = obj.cy + Y;
 obj.cz = obj.cz + Z;
 
 @回転中心アンカー指定
---information:回転中心アンカー指定@Basic_S v1.00 (for beta15) by σ軸
+--information:回転中心アンカー指定@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
@@ -1163,7 +1163,7 @@ obj.ox,	obj.oy,	obj.oz = obj.ox + dx, obj.oy + dy, obj.oz + dz;
 obj.cx,obj.cy,obj.cz = cx, cy, cz;
 
 @上下左右揃え
---information:上下左右揃え@Basic_S v1.00 (for beta15) by σ軸
+--information:上下左右揃え@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@X:左右%,-100,100,0,0.001
 --track@Y:上下%,-100,100,0,0.001
@@ -1185,7 +1185,7 @@ if cx ~= obj.cx or cy ~= obj.cy then
 end
 
 @直角回転
---information:直角回転@Basic_S v1.00 (for beta15) by σ軸
+--information:直角回転@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\配置
 --select@rot:方向=0,なし=0,90°時計回り=1,180°反転=2,90°反時計回り=3,左右反転=4,上下反転=5,右上軸反転=6,左上軸反転=7
 --check@move_center:中心の位置を変更,0
@@ -1233,7 +1233,7 @@ obj.copybuffer("object", "tempbuffer");
 if not move_center then obj.cx, obj.cy = obj.cx + (cx - cx0), obj.cy + (cy - cy0) end
 
 @XYZ追加回転
---information:XYZ追加回転@Basic_S v1.00 (for beta15) by σ軸
+--information:XYZ追加回転@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@X:X,-720,720,0,0.01
 --track@Y:Y,-720,720,0,0.01
@@ -1300,7 +1300,7 @@ if angle ~= 0 or draw then
 end
 
 @任意軸追加回転
---information:任意軸追加回転@Basic_S v1.00 (for beta15) by σ軸
+--information:任意軸追加回転@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\配置
 --track@angle:角度,-720,720,0,0.01
 --track0:回転軸X,-512,512,0,0.001
@@ -1545,7 +1545,7 @@ else
 end
 
 @傾斜
---information:傾斜@Basic_S v1.00 (for beta15) by σ軸
+--information:傾斜@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\変形
 --track@angle:角度,-80,80,0,0.001
 --track@slope:傾き%,-500,500,0,0.001
@@ -1623,7 +1623,7 @@ obj.copybuffer("object", "tempbuffer");
 obj.cx, obj.cy = obj.cx - cx, obj.cy - cy;
 
 @XY軸変形
---information:XY軸変形@Basic_S v1.00 (for beta15) by σ軸
+--information:XY軸変形@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\変形
 --value@axis_X:X軸,{100,0}
 --check@stretch_X:X長さ変更,0
@@ -1678,7 +1678,7 @@ obj.drawpoly(
 obj.copybuffer("object", "tempbuffer");
 
 @領域サイズ変更
---information:領域サイズ変更@Basic_S v1.00 (for beta15) by σ軸
+--information:領域サイズ変更@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上,-4000,4000,0,1
 --track@B:下,-4000,4000,0,1
@@ -1765,7 +1765,7 @@ end
 obj.cx, obj.cy = cx, cy;
 
 @領域割合サイズ変更
---information:領域割合サイズ変更@Basic_S v1.00 (for beta15) by σ軸
+--information:領域割合サイズ変更@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上%,-100,100,0,0.001
 --track@B:下%,-100,100,0,0.001
@@ -1819,7 +1819,7 @@ if L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @領域サイズ指定
---information:領域サイズ指定@Basic_S v1.00 (for beta15) by σ軸
+--information:領域サイズ指定@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -1913,7 +1913,7 @@ elseif L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @カットずらし
---information:カットずらし@Basic_S v1.00 (for beta15) by σ軸
+--information:カットずらし@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track0:ずれX,-4000,4000,40,1
 --track1:ずれY,-4000,4000,0,1
@@ -2122,7 +2122,7 @@ if not move_center then
 end
 
 @中抜きクリッピング
---information:中抜きクリッピング@Basic_S v1.00 (for beta15) by σ軸
+--information:中抜きクリッピング@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -2222,7 +2222,7 @@ else
 end
 
 @小数ぼかし
---information:小数ぼかし@Basic_S v1.00 (for beta15) by σ軸
+--information:小数ぼかし@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\ぼかし
 --track@range:範囲,0,1000,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2365,7 +2365,7 @@ if luma_weight > 0 then
 end
 
 @縁取りα
---information:縁取りα@Basic_S v1.00 (for beta15) by σ軸
+--information:縁取りα@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,1
 --track@blur:ぼかし,0,100,5,1
@@ -2542,7 +2542,7 @@ elseif alpha_front > 0 then
 end
 
 @四角縁取り
---information:四角縁取り@Basic_S v1.00 (for beta15) by σ軸
+--information:四角縁取り@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2784,7 +2784,7 @@ else
 end
 
 @内側シャドウ
---information:内側シャドウ@Basic_S v1.00 (for beta15) by σ軸
+--information:内側シャドウ@Basic_S v1.10 (for beta19a) by σ軸
 --label:Basic_S\装飾
 --track@X:X,-1000,1000,-40,0.01
 --track@Y:Y,-1000,1000,24,0.01
@@ -2940,3 +2940,552 @@ obj.copybuffer("object", "tempbuffer");
 
 -- carve the image.
 obj.pixelshader("identity", "object", cache_name, nil, "mask");
+
+@画像ファイル合成
+--information:画像ファイル合成 v1.10 (for beta19a) by σ軸
+--label:Basic_S\加工
+--file@file:画像ファイル
+--track0:X,-4000,4000,0,0.01
+--track1:Y,-4000,4000,0,0.01
+--track@zoom:拡大率,0,5000,100,0.001
+--track@rotate:回転,-720,720,0,0.01
+--track@alpha:透明度,0,100,0,0.01
+--check@no_smooth:補間なし,0
+--check@fixed_size:サイズ固定,0
+--select@mode_tile:画像ループ=0,なし=0,横=1,縦=2,縦横=3
+--select@mode_draw:モード=0,前方から合成=0,後方から合成=1,アルファ値を乗算=2,色情報を上書き=3,輝度をアルファ値として上書き=4,輝度をアルファ値として乗算=5
+--select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--value@PI:PI,{}
+--[[pixelshader@tile:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float2 size, move;
+	float2x2 rot;
+	float2 tile_f;
+	float no_smooth;
+};
+float2 wrap(float2 p)
+{
+	p /= size;
+	return size * (tile_f > 0 ? p - floor(p) : p);
+}
+int2 wrap_i(int2 p)
+{
+	return tile_f > 0 ? uint2(p) % uint2(size) : p;
+}
+float4 tile(float4 pos : SV_Position) : SV_Target
+{
+	float2 fr = wrap(mul(rot, pos.xy) + move - 0.5);
+	const int2 p00 = floor(fr),
+		p10 = wrap_i(p00 + int2(1, 0)),
+		p01 = wrap_i(p00 + int2(0, 1)),
+		p11 = wrap_i(p00 + int2(1, 1));
+	fr -= p00;
+	if (no_smooth > 0) fr = floor(fr + 0.5);
+
+	return lerp(
+		lerp(src.Load(int3(p00, 0)), src.Load(int3(p10, 0)), fr.x),
+		lerp(src.Load(int3(p01, 0)), src.Load(int3(p11, 0)), fr.x), fr.y);
+}
+]]
+--[[pixelshader@mask:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 mask(float4 pos : SV_Position) : SV_Target
+{
+	return float4(0, 0, 0,
+		1 - intensity * (1 - src.Load(int3(pos.xy, 0)).a));
+}
+]]
+--[[pixelshader@replace_col:
+Texture2D dst : register(t0);
+Texture2D src : register(t1);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 replace_col(float4 pos : SV_Position) : SV_Target
+{
+	const float4 c0 = dst.Load(int3(pos.xy, 0)), c1 = src.Load(int3(pos.xy, 0));
+	const float a0 = max(c0.a, 0);
+	return lerp(c0, c1 * (a0 < c1.a ? a0 / c1.a : 1), intensity);
+}
+]]
+--[[pixelshader@luma_as_alpha:
+Texture2D dst : register(t0);
+Texture2D src : register(t1);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 luma_as_alpha(float4 pos : SV_Position) : SV_Target
+{
+	static const float3 luma_coeff = { 0.299, 0.587, 0.114 };
+	const float4 c0 = dst.Load(int3(pos.xy, 0));
+	const float a1 = max(dot(luma_coeff, src.Load(int3(pos.xy, 0)).rgb), 0);
+	return c0 * (1 - intensity * (1 - (c0.a > a1 ? a1 / c0.a : 1)));
+}
+]]
+--[[pixelshader@mask_by_luma:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 mask_by_luma(float4 pos : SV_Position) : SV_Target
+{
+	static const float3 luma_coeff = { 0.299, 0.587, 0.114 };
+	return float4(0, 0, 0,
+		1 - intensity * (1 - dot(luma_coeff, src.Load(int3(pos.xy, 0)).rgb)));
+}
+]]
+local obj, math, type, tonumber = obj, math, type, tonumber;
+
+-- set anchors.
+if #file >= 4 then
+	obj.setanchor("track", 0, "line");
+end
+
+-- take parameters.
+--[==[
+	PI = {
+		file:		string?,
+		X:			number?,
+		Y:			number?,
+		zoom:		number?,
+		rotate:		number?,
+		alpha:		number?,
+		no_smooth:	boolean|number|nil,
+		fixed_size:	boolean|number|nil,
+		mode_tile:	string?,
+		mode_draw:	string?,
+		blend:		string?,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+file = type(PI.file) == "string" and PI.file or file;
+local X, Y = tonumber(PI.X) or obj.track0, tonumber(PI.Y) or obj.track1;
+zoom = tonumber(PI.zoom) or zoom;
+rotate = tonumber(PI.rotate) or rotate;
+alpha = tonumber(PI.alpha) or alpha;
+no_smooth = as_bool(PI.no_smooth, no_smooth ~= 0);
+fixed_size = as_bool(PI.fixed_size, fixed_size ~= 0);
+if type(PI.mode_tile) == "string" then
+	local name2num = {
+		["なし"] = 0, ["横"] = 1, ["縦"] = 2, ["縦横"] = 3,
+	};
+	mode_tile = name2num[PI.mode_tile] or mode_tile;
+end
+if type(PI.mode_draw) == "string" then
+	local name2num = {
+		["前方から合成"] = 0, ["後方から合成"] = 1, ["アルファ値を乗算"] = 2,
+		["色情報を上書き"] = 3, ["輝度をアルファ値として上書き"] = 4, ["輝度をアルファ値として乗算"] = 5,
+	};
+	mode_draw = name2num[PI.mode_draw] or mode_draw;
+end
+if type(PI.blend) == "string" then
+	local name2num = {
+		["通常"] = 0, ["加算"] = 1, ["減算"] = 2, ["乗算"] = 3, ["スクリーン"] = 4, ["オーバーレイ"] = 5,
+		["比較(明)"] = 6, ["比較(暗)"] = 7, ["輝度"] = 8, ["色差"] = 9,
+		["陰影"] = 10, ["明暗"] = 11, ["差分"] = 12,
+		["alpha_add"] = 100, ["alpha_max"] = 101, ["alpha_sub"] = 102, ["alpha_add2"] = 103,
+	};
+	blend = name2num[PI.blend] or blend;
+end
+
+-- normalize parameters.
+zoom = math.min(math.max(zoom / 100, 0), 50);
+rotate = math.pi / 180 * (rotate % 360);
+alpha = math.min(math.max(1 - alpha / 100, 0), 1);
+mode_tile = math.min(math.max(math.floor(mode_tile), 0), 3);
+mode_draw = math.min(math.max(math.floor(mode_draw), 0), 5);
+blend = ({
+	[0] = "none", "add", "sub", "mul", "screen", "overlay",
+	"light", "dark", "brightness", "chroma", "shadow", "light_dark", "diff",
+	[100] = "alpha_add", [101] = "alpha_max", [102] = "alpha_sub", [103] = "alpha_add2",
+})[blend] or "none";
+
+fixed_size = fixed_size or mode_tile ~= 0 or mode_draw >= 2;
+if #file < 4 or -- no valid file name.
+	zoom <= 0 or (alpha <= 0 and fixed_size) then
+	return;
+end
+
+-- try loading the image.
+local w, h = obj.w, obj.h;
+local obj_props = { obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha };
+local cache_name = "cache:basic_s/combine/obj"
+obj.copybuffer(cache_name, "object");
+obj.load("image", file);
+local W, H, dcx, dcy = obj.w, obj.h, 0, 0;
+if W > 0 and H > 0 then
+	-- determine the canvas size.
+	local L, R, T, B, c, s = -w / 2, w / 2, -h / 2, h / 2, math.cos(rotate), math.sin(rotate);
+	if not fixed_size then
+		local C, S = zoom * math.abs(c), zoom * math.abs(s);
+		L, T = W * C + H * S, W * S + H * C;
+		L, R, T, B = X - L / 2, X + L / 2, Y - T / 2, Y + T / 2;
+		L, R = math.floor(math.min(L + w / 2, 0)) - w / 2, math.ceil(math.max(R + w / 2, w)) - w / 2;
+		T, B = math.floor(math.min(T + h / 2, 0)) - h / 2, math.ceil(math.max(B + h / 2, h)) - h / 2;
+		dcx, dcy = -(L + R) / 2, -(T + B) / 2;
+	end
+
+	-- process rotate / zoom / tile.
+	if alpha > 0 then
+		obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+		obj.pixelshader("tile", "tempbuffer", "object", {
+			W, H;
+			(c * (L - X) + s * (T - Y)) / zoom + W / 2,
+			(-s * (L - X) + c * (T - Y)) / zoom + H / 2;
+			c / zoom, -s / zoom, 0, 0,
+			s / zoom, c / zoom;
+			mode_tile % 2, math.floor(mode_tile / 2);
+			no_smooth and 1 or 0;
+		});
+	end
+
+	if mode_draw == 2 then
+		-- mask.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("mask", "object", "tempbuffer", { alpha }, "mask");
+	elseif mode_draw == 3 then
+		-- replace color.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("replace_col", "object", { "object", "tempbuffer" }, { alpha });
+	elseif mode_draw == 4 then
+		-- replace luma with alpha.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("luma_as_alpha", "object", { "object", "tempbuffer" }, { alpha });
+	elseif mode_draw >= 5 then
+		-- multiply luma to alpha.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("mask_by_luma", "object", "tempbuffer", { alpha }, "mask");
+	elseif alpha > 0 then
+		if mode_draw == 0 then
+			-- combine from front.
+			if L < -w / 2 or R > w / 2 or T < -h / 2 or B > h / 2 then
+				obj.copybuffer("object", cache_name);
+				obj.effect("領域拡張", "左", -L - w / 2, "右", R - w / 2, "上", -T - h / 2, "下", B - h / 2);
+				obj.copybuffer(cache_name, "object");
+			end
+			obj.copybuffer("object", "tempbuffer");
+			obj.copybuffer("tempbuffer", cache_name);
+			obj.setoption("blend", blend);
+			obj.draw(0, 0, 0, 1, alpha);
+		else -- mode_draw == 1
+			-- combine from back.
+			obj.copybuffer("object", "tempbuffer");
+			obj.clearbuffer("tempbuffer");
+			obj.draw(0, 0, 0, 1, alpha);
+			obj.copybuffer("object", cache_name);
+			obj.setoption("blend", blend);
+			obj.draw(dcx, dcy);
+		end
+		obj.setoption("blend", "none");
+		obj.copybuffer("object", "tempbuffer");
+	elseif mode_draw == 0 then
+		-- combine from front.
+		obj.copybuffer("object", cache_name);
+		if L < -w / 2 or R > w / 2 or T < -h / 2 or B > h / 2 then
+			obj.effect("領域拡張", "左", -L - w / 2, "右", R - w / 2, "上", -T - h / 2, "下", B - h / 2);
+		end
+	else -- mode_draw == 1
+		-- combine from back.
+		obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+		obj.copybuffer("object", cache_name);
+		obj.setoption("blend", blend);
+		obj.draw(dcx, dcy);
+		obj.setoption("blend", "none");
+		obj.copybuffer("object", "tempbuffer");
+	end
+else obj.copybuffer("object", cache_name) end
+obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha = unpack(obj_props);
+
+-- adjust the center.
+obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
+
+@動画ファイル合成
+--information:動画ファイル合成 v1.10 (for beta19a) by σ軸
+--label:Basic_S\加工
+--file@file:動画ファイル
+--track@start:再生開始秒,0,3600,0,0.001
+--track@rate:再生速度,-2000,2000,100,0.001
+--check@loop:ループ再生,0
+--track0:X,-4000,4000,0,0.01
+--track1:Y,-4000,4000,0,0.01
+--track@zoom:拡大率,0,5000,100,0.001
+--track@rotate:回転,-720,720,0,0.01
+--track@alpha:透明度,0,100,0,0.01
+--check@no_smooth:補間なし,0
+--check@fixed_size:サイズ固定,0
+--select@mode_tile:画像ループ=0,なし=0,横=1,縦=2,縦横=3
+--select@mode_draw:モード=0,前方から合成=0,後方から合成=1,アルファ値を乗算=2,色情報を上書き=3,輝度をアルファ値として上書き=4,輝度をアルファ値として乗算=5
+--select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--value@PI:PI,{}
+--[[pixelshader@tile:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float2 size, move;
+	float2x2 rot;
+	float2 tile_f;
+	float no_smooth;
+};
+float2 wrap(float2 p)
+{
+	p /= size;
+	return size * (tile_f > 0 ? p - floor(p) : p);
+}
+int2 wrap_i(int2 p)
+{
+	return tile_f > 0 ? uint2(p) % uint2(size) : p;
+}
+float4 tile(float4 pos : SV_Position) : SV_Target
+{
+	float2 fr = wrap(mul(rot, pos.xy) + move - 0.5);
+	const int2 p00 = floor(fr),
+		p10 = wrap_i(p00 + int2(1, 0)),
+		p01 = wrap_i(p00 + int2(0, 1)),
+		p11 = wrap_i(p00 + int2(1, 1));
+	fr -= p00;
+	if (no_smooth > 0) fr = floor(fr + 0.5);
+
+	return lerp(
+		lerp(src.Load(int3(p00, 0)), src.Load(int3(p10, 0)), fr.x),
+		lerp(src.Load(int3(p01, 0)), src.Load(int3(p11, 0)), fr.x), fr.y);
+}
+]]
+--[[pixelshader@mask:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 mask(float4 pos : SV_Position) : SV_Target
+{
+	return float4(0, 0, 0,
+		1 - intensity * (1 - src.Load(int3(pos.xy, 0)).a));
+}
+]]
+--[[pixelshader@replace_col:
+Texture2D dst : register(t0);
+Texture2D src : register(t1);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 replace_col(float4 pos : SV_Position) : SV_Target
+{
+	const float4 c0 = dst.Load(int3(pos.xy, 0)), c1 = src.Load(int3(pos.xy, 0));
+	const float a0 = max(c0.a, 0);
+	return lerp(c0, c1 * (a0 < c1.a ? a0 / c1.a : 1), intensity);
+}
+]]
+--[[pixelshader@luma_as_alpha:
+Texture2D dst : register(t0);
+Texture2D src : register(t1);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 luma_as_alpha(float4 pos : SV_Position) : SV_Target
+{
+	static const float3 luma_coeff = { 0.299, 0.587, 0.114 };
+	const float4 c0 = dst.Load(int3(pos.xy, 0));
+	const float a1 = max(dot(luma_coeff, src.Load(int3(pos.xy, 0)).rgb), 0);
+	return c0 * (1 - intensity * (1 - (c0.a > a1 ? a1 / c0.a : 1)));
+}
+]]
+--[[pixelshader@mask_by_luma:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float intensity;
+};
+float4 mask_by_luma(float4 pos : SV_Position) : SV_Target
+{
+	static const float3 luma_coeff = { 0.299, 0.587, 0.114 };
+	return float4(0, 0, 0,
+		1 - intensity * (1 - dot(luma_coeff, src.Load(int3(pos.xy, 0)).rgb)));
+}
+]]
+local obj, math, type, tonumber = obj, math, type, tonumber;
+
+-- set anchors.
+if #file >= 4 then
+	obj.setanchor("track", 0, "line");
+end
+
+-- take parameters.
+--[==[
+	PI = {
+		file:		string?,
+		start:		number?,
+		rate:		number?,
+		loop:		boolean|number|nil,
+		X:			number?,
+		Y:			number?,
+		zoom:		number?,
+		rotate:		number?,
+		alpha:		number?,
+		no_smooth:	boolean|number|nil,
+		fixed_size:	boolean|number|nil,
+		mode_tile:	string?,
+		mode_draw:	string?,
+		blend:		string?,
+	}
+]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
+file = type(PI.file) == "string" and PI.file or file;
+start = tonumber(PI.start) or start;
+rate = tonumber(PI.rate) or rate;
+loop = as_bool(PI.loop, loop ~= 0);
+local X, Y = tonumber(PI.X) or obj.track0, tonumber(PI.Y) or obj.track1;
+zoom = tonumber(PI.zoom) or zoom;
+rotate = tonumber(PI.rotate) or rotate;
+alpha = tonumber(PI.alpha) or alpha;
+no_smooth = as_bool(PI.no_smooth, no_smooth ~= 0);
+fixed_size = as_bool(PI.fixed_size, fixed_size ~= 0);
+if type(PI.mode_tile) == "string" then
+	local name2num = {
+		["なし"] = 0, ["横"] = 1, ["縦"] = 2, ["縦横"] = 3,
+	};
+	mode_tile = name2num[PI.mode_tile] or mode_tile;
+end
+if type(PI.mode_draw) == "string" then
+	local name2num = {
+		["前方から合成"] = 0, ["後方から合成"] = 1, ["アルファ値を乗算"] = 2,
+		["色情報を上書き"] = 3, ["輝度をアルファ値として上書き"] = 4, ["輝度をアルファ値として乗算"] = 5,
+	};
+	mode_draw = name2num[PI.mode_draw] or mode_draw;
+end
+if type(PI.blend) == "string" then
+	local name2num = {
+		["通常"] = 0, ["加算"] = 1, ["減算"] = 2, ["乗算"] = 3, ["スクリーン"] = 4, ["オーバーレイ"] = 5,
+		["比較(明)"] = 6, ["比較(暗)"] = 7, ["輝度"] = 8, ["色差"] = 9,
+		["陰影"] = 10, ["明暗"] = 11, ["差分"] = 12,
+		["alpha_add"] = 100, ["alpha_max"] = 101, ["alpha_sub"] = 102, ["alpha_add2"] = 103,
+	};
+	blend = name2num[PI.blend] or blend;
+end
+
+-- normalize parameters.
+start = math.max(start, 0);
+rate = rate / 100;
+zoom = math.min(math.max(zoom / 100, 0), 50);
+rotate = math.pi / 180 * (rotate % 360);
+alpha = math.min(math.max(1 - alpha / 100, 0), 1);
+mode_tile = math.min(math.max(math.floor(mode_tile), 0), 3);
+mode_draw = math.min(math.max(math.floor(mode_draw), 0), 5);
+blend = ({
+	[0] = "none", "add", "sub", "mul", "screen", "overlay",
+	"light", "dark", "brightness", "chroma", "shadow", "light_dark", "diff",
+	[100] = "alpha_add", [101] = "alpha_max", [102] = "alpha_sub", [103] = "alpha_add2",
+})[blend] or "none";
+
+fixed_size = fixed_size or mode_tile ~= 0 or mode_draw >= 2;
+if #file < 4 or -- no valid file name.
+	zoom <= 0 or (alpha <= 0 and fixed_size) then
+	return;
+end
+
+-- try loading the video.
+local w, h = obj.w, obj.h;
+local obj_props = { obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha };
+local cache_name = "cache:basic_s/combine/obj"
+obj.copybuffer(cache_name, "object");
+local video_pos = start + rate * obj.time;
+local video_len = obj.load("movie", file, math.max(video_pos, 0));
+local W, H, dcx, dcy = obj.w, obj.h, 0, 0;
+if video_len > 0 and W > 0 and H > 0 then
+	-- load the correct position of the video.
+	if loop and (0 > video_pos or video_pos >= video_len) then
+		obj.load("movie", file, video_pos % video_len);
+	end
+
+	-- determine the canvas size.
+	local L, R, T, B, c, s = -w / 2, w / 2, -h / 2, h / 2, math.cos(rotate), math.sin(rotate);
+	if not fixed_size then
+		local C, S = zoom * math.abs(c), zoom * math.abs(s);
+		L, T = W * C + H * S, W * S + H * C;
+		L, R, T, B = X - L / 2, X + L / 2, Y - T / 2, Y + T / 2;
+		L, R = math.floor(math.min(L + w / 2, 0)) - w / 2, math.ceil(math.max(R + w / 2, w)) - w / 2;
+		T, B = math.floor(math.min(T + h / 2, 0)) - h / 2, math.ceil(math.max(B + h / 2, h)) - h / 2;
+		dcx, dcy = -(L + R) / 2, -(T + B) / 2;
+	end
+
+	-- process rotate / zoom / tile.
+	if alpha > 0 then
+		obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+		obj.pixelshader("tile", "tempbuffer", "object", {
+			W, H;
+			(c * (L - X) + s * (T - Y)) / zoom + W / 2,
+			(-s * (L - X) + c * (T - Y)) / zoom + H / 2;
+			c / zoom, -s / zoom, 0, 0,
+			s / zoom, c / zoom;
+			mode_tile % 2, math.floor(mode_tile / 2);
+			no_smooth and 1 or 0;
+		});
+	end
+
+	if mode_draw == 2 then
+		-- mask.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("mask", "object", "tempbuffer", { alpha }, "mask");
+	elseif mode_draw == 3 then
+		-- replace color.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("replace_col", "object", { "object", "tempbuffer" }, { alpha });
+	elseif mode_draw == 4 then
+		-- replace luma with alpha.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("luma_as_alpha", "object", { "object", "tempbuffer" }, { alpha });
+	elseif mode_draw >= 5 then
+		-- multiply luma to alpha.
+		obj.copybuffer("object", cache_name);
+		obj.pixelshader("mask_by_luma", "object", "tempbuffer", { alpha }, "mask");
+	elseif alpha > 0 then
+		if mode_draw == 0 then
+			-- combine from front.
+			if L < -w / 2 or R > w / 2 or T < -h / 2 or B > h / 2 then
+				obj.copybuffer("object", cache_name);
+				obj.effect("領域拡張", "左", -L - w / 2, "右", R - w / 2, "上", -T - h / 2, "下", B - h / 2);
+				obj.copybuffer(cache_name, "object");
+			end
+			obj.copybuffer("object", "tempbuffer");
+			obj.copybuffer("tempbuffer", cache_name);
+			obj.setoption("blend", blend);
+			obj.draw(0, 0, 0, 1, alpha);
+		else -- mode_draw == 1
+			-- combine from back.
+			obj.copybuffer("object", "tempbuffer");
+			obj.clearbuffer("tempbuffer");
+			obj.draw(0, 0, 0, 1, alpha);
+			obj.copybuffer("object", cache_name);
+			obj.setoption("blend", blend);
+			obj.draw(dcx, dcy);
+		end
+		obj.setoption("blend", "none");
+		obj.copybuffer("object", "tempbuffer");
+	elseif mode_draw == 0 then
+		-- combine from front.
+		obj.copybuffer("object", cache_name);
+		if L < -w / 2 or R > w / 2 or T < -h / 2 or B > h / 2 then
+			obj.effect("領域拡張", "左", -L - w / 2, "右", R - w / 2, "上", -T - h / 2, "下", B - h / 2);
+		end
+	else -- mode_draw == 1
+		-- combine from back.
+		obj.setoption("drawtarget", "tempbuffer", R - L, B - T);
+		obj.copybuffer("object", cache_name);
+		obj.setoption("blend", blend);
+		obj.draw(dcx, dcy);
+		obj.setoption("blend", "none");
+		obj.copybuffer("object", "tempbuffer");
+	end
+else obj.copybuffer("object", cache_name) end
+obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.zoom, obj.aspect, obj.alpha = unpack(obj_props);
+
+-- adjust the center.
+obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
