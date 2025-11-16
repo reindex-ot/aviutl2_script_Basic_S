@@ -10,7 +10,7 @@
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta19a` で動作確認済み．
+  - `beta20` で動作確認済み．
 
 ## 導入方法
 
@@ -297,6 +297,12 @@ AviUtl (無印) にあった「動画ファイル合成」と同等のことが�
 :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/動画ファイル合成)
 
 ## 改版履歴
+
+- **v1.11 (for beta20)** (2025-11-16)
+
+  - `beta20` での仕様変更に合わせて修正．
+
+  - 「任意軸追加回転」で X, Y, Z 個別の拡大率を，回転軸の計算に含めていなかったのを修正．
 
 - **v1.10 (for beta19a)** (2025-11-14)
 
