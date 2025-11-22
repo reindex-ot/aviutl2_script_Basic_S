@@ -73,6 +73,8 @@
 
 別レイヤーと同じ画像を読み込みます．座標や拡大率などの情報もある程度は復元できます．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/別レイヤー)
+
 ##  追加されるフィルタ効果
 
 ### 四隅丸め
@@ -313,9 +315,13 @@ AviUtl (無印) にあった「動画ファイル合成」と同等のことが�
 - 標準のトラックバー移動方法「移動量指定」の拡張版で，細かい調整が利く他，常に 0 以上な設定項目でも小さくなる方向に変化させられます．
 - 「設定」に負数を指定すると，オブジェクト終了時に右の値になるような直線移動になります．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/等速移動)
+
 ### 等速移動(フレーム)
 
 [「等速移動(秒)」](#等速移動秒)と同様ですが，「設定」が秒単位でなくフレーム単位な点が違います．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/等速移動)
 
 ### コマ落ち反復(秒)
 
@@ -324,17 +330,25 @@ AviUtl (無印) にあった「動画ファイル合成」と同等のことが�
 - 1 周期の開始点はオブジェクト開始点が基準になります．
 - 「設定」に負数を指定すると，1 周期の開始点の基準がオブジェクトの終了点になります．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ち反復)
+
 ### コマ落ち反復(フレーム)
 
 [「コマ落ち反復(秒)」](#コマ落ち反復秒)と同様ですが，「設定」が秒単位でなくフレーム単位な点が違います．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ち反復)
 
 ### コマ落ち反復(Hz)
 
 [「コマ落ち反復(秒)」](#コマ落ち反復秒)と同様ですが，「設定」が秒単位でなく[ヘルツ (Hz) 単位](https://ja.wikipedia.org/wiki/ヘルツ)な点が違います．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ち反復)
+
 ### コマ落ち反復(BPM)
 
 [「コマ落ち反復(秒)」](#コマ落ち反復秒)と同様ですが，「設定」が秒単位でなく BPM 単位 (1分間あたりの回数) な点が違います．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ち反復)
 
 ### コマ落ちランダム(秒)
 
@@ -344,17 +358,25 @@ AviUtl (無印) にあった「動画ファイル合成」と同等のことが�
 - 切り替わりのタイミングはオブジェクト開始点が基準になります．
 - 「設定」に負数を指定すると，切り替わりタイミングの基準がオブジェクトの終了点になります．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ちランダム)
+
 ### コマ落ちランダム(フレーム)
 
 [「コマ落ちランダム(秒)」](#コマ落ちランダム秒)と同様ですが，「設定」が秒単位でなくフレーム単位な点が違います．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ちランダム)
 
 ### コマ落ちランダム(Hz)
 
 [「コマ落ちランダム(秒)」](#コマ落ちランダム秒)と同様ですが，「設定」が秒単位でなく[ヘルツ (Hz) 単位](https://ja.wikipedia.org/wiki/ヘルツ)な点が違います．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ちランダム)
+
 ### コマ落ちランダム(BPM)
 
 [「コマ落ちランダム(秒)」](#コマ落ちランダム秒)と同様ですが，「設定」が秒単位でなく BPM 単位 (1分間あたりの回数) な点が違います．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ちランダム)
 
 ## 改版履歴
 
