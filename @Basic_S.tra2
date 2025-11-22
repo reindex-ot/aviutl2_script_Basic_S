@@ -1,0 +1,137 @@
+--[[
+MIT License
+Copyright (c) 2025 sigma-axis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+https://mit-license.org/
+]]
+@等速移動(秒)
+--information:等速移動(秒)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S
+--twopoint
+--param:1
+local gp = obj.getpoint;
+local t, T, v0, v1 = gp("time"), gp("param"), gp(0), gp(1);
+if 1 / T < 0 then t, T, v0, v1 = gp("time", 1) - t, -T, v1, v0 end
+if T == 0 then T = 1 end
+return v0 + (v1 - v0) * t / T;
+
+@等速移動(フレーム)
+--information:等速移動(フレーム)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S
+--twopoint
+--param:60
+local gp = obj.getpoint;
+local fr = gp("framerate");
+local f, F, v0, v1 = fr * gp("time"), gp("param"), gp(0), gp(1);
+if 1 / F < 0 then f, F, v0, v1 = fr * gp("time", 1) - f, -F, v1, v0 end
+if F == 0 then F = 1 end
+return v0 + (v1 - v0) * f / F;
+
+@コマ落ち反復(秒)
+--information:コマ落ち反復(秒)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:0.5
+local gp = obj.getpoint;
+local t, T = gp("time"), gp("param");
+if 1 / T < 0 then t, T = t - gp("time", 1) - 1 / gp("framerate"), -T end
+if T == 0 then T = 1 end
+return gp(((t / T) % 1) < 0.5 and 0 or 1);
+
+@コマ落ち反復(フレーム)
+--information:コマ落ち反復(フレーム)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:30
+local gp = obj.getpoint;
+local fr = gp("framerate");
+local f, F = fr * gp("time"), gp("param");
+if 1 / F < 0 then f, F = f - fr * gp("time", 1) - 1, -F end
+if F == 0 then F = 1 end
+return gp(((f / F) % 1) < 0.5 and 0 or 1);
+
+@コマ落ち反復(Hz)
+--information:コマ落ち反復(Hz)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:2
+local gp = obj.getpoint;
+local t, N = gp("time"), gp("param");
+if 1 / N < 0 then t, N = t - gp("time", 1) - 1 / gp("framerate"), -N end
+return gp(((t * N) % 1) < 0.5 and 0 or 1);
+
+@コマ落ち反復(BPM)
+--information:コマ落ち反復(BPM)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:120
+local gp = obj.getpoint;
+local t, N = gp("time"), gp("param");
+if 1 / N < 0 then t, N = t - gp("time", 1) - 1 / gp("framerate"), -N end
+return gp(((t * N / 60) % 1) < 0.5 and 0 or 1);
+
+@コマ落ちランダム(秒)
+--information:コマ落ち反復(秒)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:0.5
+local gp = obj.getpoint;
+local t, T = gp("time"), gp("param");
+if 1 / T < 0 then t = t - gp("time", 1) - 1 / gp("framerate") end
+if T == 0 then T = 1 end
+local v0, v1 = gp(0), gp(1);
+return v0 + (v1 - v0) * rand1(2525, math.floor(t / T) + 1);
+
+@コマ落ちランダム(フレーム)
+--information:コマ落ち反復(フレーム)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:30
+local gp = obj.getpoint;
+local fr = gp("framerate");
+local f, F = fr * gp("time"), gp("param");
+if 1 / F < 0 then f = f - fr * gp("time", 1) - 1 end
+if F == 0 then F = 1 end
+local v0, v1 = gp(0), gp(1);
+return v0 + (v1 - v0) * rand1(2525, math.floor(f / F) + 1);
+
+@コマ落ちランダム(Hz)
+--information:コマ落ち反復(Hz)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:2
+local gp = obj.getpoint;
+local t, N = gp("time"), gp("param");
+if 1 / N < 0 then t = t - gp("time", 1) - 1 / gp("framerate") end
+local v0, v1 = gp(0), gp(1);
+return v0 + (v1 - v0) * rand1(2525, math.floor(t * N) + 1);
+
+@コマ落ちランダム(BPM)
+--information:コマ落ち反復(BPM)@Basic_S v1.20 (for beta20) by σ軸
+--label:Basic_S\コマ落ち
+--twopoint
+--param:120
+local gp = obj.getpoint;
+local t, N = gp("time"), gp("param");
+if 1 / N < 0 then t = t - gp("time", 1) - 1 / gp("framerate") end
+local v0, v1 = gp(0), gp(1);
+return v0 + (v1 - v0) * rand1(2525, math.floor(t * N / 60) + 1);
+
