@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @四隅丸め
---information:四隅丸め@Basic_S v1.20 (for beta20) by σ軸
+--information:四隅丸め@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track@radius:半径,0,2000,40,0.01
 --check@uniform:半径均一,true
@@ -279,7 +279,7 @@ obj.pixelshader("carve", "object", nil, {
 }, "mask");
 
 @背景角丸矩形
---information:背景角丸矩形@Basic_S v1.20 (for beta20) by σ軸
+--information:背景角丸矩形@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -580,7 +580,7 @@ end
 obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
 
 @背景楕円
---information:背景楕円@Basic_S v1.20 (for beta20) by σ軸
+--information:背景楕円@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -691,7 +691,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @背景菱形
---information:背景菱形@Basic_S v1.20 (for beta20) by σ軸
+--information:背景菱形@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -805,7 +805,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @透明度適用
---information:透明度適用@Basic_S v1.20 (for beta20) by σ軸
+--information:透明度適用@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\加工
 --track@alpha:透明度,-100,100,0,0.01
 --check@apply_former:累積分も適用,false
@@ -824,7 +824,7 @@ if apply_former then obj.alpha, alpha = 1, alpha * obj.alpha end
 if alpha ~= 1 then obj.pixelshader("const_alpha", "object", nil, { alpha }, "mask") end
 
 @透明度二値化
---information:透明度二値化@Basic_S v1.20 (for beta20) by σ軸
+--information:透明度二値化@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\加工
 --track@alpha:基準透明度,0,100,50,0.01
 --track@buffer:ぼかし幅,0,100,8,0.01
@@ -864,7 +864,7 @@ if alpha > 0 or buffer < 1 then
 end
 
 @色調補正
---information:色調補正@Basic_S v1.20 (for beta20) by σ軸
+--information:色調補正@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\色調整
 --track@add_light:明るさ,0,200,100,0.01
 --track@contrast:コントラスト,0,200,100,0.01
@@ -873,7 +873,7 @@ end
 --check@rev_light:輝度反転,false
 --track@mul_sat:彩度,0,200,100,0.01
 --check@saturate:飽和する,false
---select@space:色空間=4,XYZ(sRGB)=0,YUV(BT.601)=1,YUV(BT.709)=2,YUV(BT.2020)=3,HSV(円柱)=4,HSV(円錐)=5,HSL(円柱)=6,HSL(双円錐)=7
+--select@space:色空間=5,XYZ(sRGB)=0,OKLCH=1,YUV(BT.601)=2,YUV(BT.709)=3,YUV(BT.2020)=4,HSV(円柱)=5,HSV(円錐)=6,HSL(円柱)=7,HSL(双円錐)=8
 --value@PI:PI,{}
 --[[pixelshader@by_xyz:
 Texture2D src : register(t0);
@@ -897,6 +897,43 @@ float4 by_xyz(float4 pos : SV_Position) : SV_Target
 	c.rgb = to_lin(c.a > 0 ? c.rgb / c.a : 0);
 	c.rgb = mul(mat, c.rgb) + add_light;
 	c.rgb = c.a * from_lin(c.rgb);
+	if (sat > 0) c.rgb = clamp(c.rgb, 0, c.a);
+	return c;
+}
+]]
+--[[pixelshader@by_oklab:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float3x3 mat;
+	float add_light, sat;
+};
+static const float3x3 m1_rgb = {
+	0.41222146, 0.53633255, 0.051445995,
+	0.2119035, 0.6806995, 0.10739696,
+	0.08830246, 0.28171885, 0.6299787
+}, m1_rgb_i = {
+	4.0767417,-3.3077116,0.23096994,
+	-1.268438,2.6097574,-0.34131938,
+	-0.0041960864,-0.7034186,1.7076147
+};
+float3 to_lms_gamma(float3 c)
+{
+	static const float4 K = { 0.055, 1 / 1.055, 1 / 12.92, 0.04045 };
+	c = mul(m1_rgb, abs(c) <= K.w ? K.z * c : sign(c) * pow((abs(c) + K.x) * K.y, 2.4));
+	return sign(c) * pow(abs(c), 1 / 3.0);
+}
+float3 from_lms_gamma(float3 c)
+{
+	c = mul(m1_rgb_i, c * c * c);
+	static const float4 K = { 0.055, 1.055, 12.92, 0.0031308 };
+	return abs(c) <= K.w ? K.z * c : sign(c) * (K.y * pow(abs(c), 1 / 2.4) - K.x);
+}
+float4 by_oklab(float4 pos : SV_Position) : SV_Target
+{
+	float4 c = src.Load(int3(pos.xy, 0));
+	c.rgb = to_lms_gamma(c.a > 0 ? c.rgb / c.a : 0);
+	c.rgb = mul(mat, c.rgb) + add_light;
+	c.rgb = c.a * from_lms_gamma(c.rgb);
 	if (sat > 0) c.rgb = clamp(c.rgb, 0, c.a);
 	return c;
 }
@@ -998,8 +1035,9 @@ mul_sat = tonumber(PI.mul_sat) or mul_sat;
 saturate = as_bool(PI.saturate, saturate);
 if type(PI.space) == "string" then
 	space = ({
-		["XYZ(sRGB)"] = 0, ["YUV(BT.601)"] = 1, ["YUV(BT.709)"] = 2, ["YUV(BT.2020)"] = 3,
-		["HSV(円柱)"] = 4, ["HSV(円錐)"] = 5, ["HSL(円柱)"] = 6, ["HSL(双円錐)"] = 7,
+		["XYZ(sRGB)"] = 0, ["OKLCH"] = 1,
+		["YUV(BT.601)"] = 2, ["YUV(BT.709)"] = 3, ["YUV(BT.2020)"] = 4,
+		["HSV(円柱)"] = 5, ["HSV(円錐)"] = 6, ["HSL(円柱)"] = 7, ["HSL(双円錐)"] = 8,
 	})[PI.space] or space;
 end
 
@@ -1009,7 +1047,7 @@ contrast = math.max(contrast / 100, 0);
 angle = angle % 360;
 mul_light = math.max(mul_light / 100, 0);
 mul_sat = math.max(mul_sat / 100, 0);
-space = math.min(math.max(math.floor(0.5 + space), 0), 6);
+space = math.min(math.max(math.floor(0.5 + space), 0), 8);
 
 -- further calculations.
 if rev_light then add_light, mul_light = add_light + 1, -mul_light end
@@ -1021,7 +1059,7 @@ add_light, mul_light, mul_sat =
 if add_light == 0 and angle == 0 and mul_light == 1 and mul_sat == 1
 	and not saturate then return end
 
-if space < 4 then
+if space < 5 then
 	local mat_conv = space == 0 and {{
 	-- (scaled (YZX minus white) <- sRGB, sRGB <- scaled (YZX minus white))-pair.
 	-- minus white is to move the white point onto the line Z = X = 0.
@@ -1033,7 +1071,15 @@ if space < 4 then
 		1, -0.86948282117431, 2.0882435025828;
 		1, 0.072396115773113, -0.62437430170414;
 		1, 1.8431349831126, 0.035899334206509;
-	}} or space == 1 and {{ -- BT.601.
+	}} or space == 1 and {{ -- OKLAB.
+		0.2104542553,  0.7936177850, -0.0040720468;
+		1.9779984951, -2.4285922050,  0.4505937099;
+		0.0259040371,  0.7827717662, -0.8086757660;
+	}, {
+		0.99999999845052,0.39633779217377,0.21580375806076;
+		1.0000000088818,-0.10556134232366,-0.063854174771706;
+		1.0000000546724,-0.089484182094966,-1.2914855378641;
+	}} or space == 2 and {{ -- BT.601.
 	-- (YUV <- RGB, RGB <- YUV)-pairs.
 		0.299, 0.587, 0.114;
 		-0.16873589164786, -0.33126410835214, 0.5;
@@ -1042,7 +1088,7 @@ if space < 4 then
 		1, 0, 1.402;
 		1, -0.34413628620102, -0.71413628620102;
 		1, 1.772, 0;
-	}} or space == 2 and {{ -- BT.709.
+	}} or space == 3 and {{ -- BT.709.
 		0.2126, 0.7152, 0.0722;
 		-0.11457210605734, -0.38542789394266, 0.5;
 		0.5, -0.45415290830582, -0.045847091694183;
@@ -1085,25 +1131,29 @@ if space < 4 then
 	end
 
 	-- apply shader.
-	obj.pixelshader(space == 0 and "by_xyz" or "by_yuv", "object", "object", {
-		M[1], M[4], M[7], 0;
-		M[2], M[5], M[8], 0;
-		M[3], M[6], M[9];
-		add_light;
-		saturate and 1 or 0;
-	});
+	obj.pixelshader(
+		space == 0 and "by_xyz" or
+		space == 1 and "by_oklab" or
+		"by_yuv",
+		"object", "object", {
+			M[1], M[4], M[7], 0;
+			M[2], M[5], M[8], 0;
+			M[3], M[6], M[9];
+			add_light;
+			saturate and 1 or 0;
+		});
 else
 	-- apply shader.
 	obj.pixelshader("by_hsvl", "object", "object", {
 		1, mul_sat, mul_light, 0;
 		angle / 360, 0, add_light;
-		space - 4;
+		space - 5;
 		saturate and 1 or 0;
 	});
 end
 
 @回転中心
---information:回転中心@Basic_S v1.20 (for beta20) by σ軸
+--information:回転中心@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@X:X,-4000,4000,0,0.01
 --track@Y:Y,-4000,4000,0,0.01
@@ -1113,7 +1163,7 @@ obj.cy = obj.cy + Y;
 obj.cz = obj.cz + Z;
 
 @回転中心アンカー指定
---information:回転中心アンカー指定@Basic_S v1.20 (for beta20) by σ軸
+--information:回転中心アンカー指定@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\配置
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
@@ -1161,7 +1211,7 @@ obj.ox,	obj.oy,	obj.oz = obj.ox + dx, obj.oy + dy, obj.oz + dz;
 obj.cx,obj.cy,obj.cz = cx, cy, cz;
 
 @上下左右揃え
---information:上下左右揃え@Basic_S v1.20 (for beta20) by σ軸
+--information:上下左右揃え@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@X:左右%,-100,100,0,0.001
 --track@Y:上下%,-100,100,0,0.001
@@ -1183,7 +1233,7 @@ if cx ~= obj.cx or cy ~= obj.cy then
 end
 
 @直角回転
---information:直角回転@Basic_S v1.20 (for beta20) by σ軸
+--information:直角回転@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\配置
 --select@rot:方向=0,なし=0,90°時計回り=1,180°反転=2,90°反時計回り=3,左右反転=4,上下反転=5,右上軸反転=6,左上軸反転=7
 --check@move_center:中心の位置を変更,false
@@ -1230,7 +1280,7 @@ obj.copybuffer("object", "tempbuffer");
 if not move_center then obj.cx, obj.cy = obj.cx + (cx - cx0), obj.cy + (cy - cy0) end
 
 @XYZ追加回転
---information:XYZ追加回転@Basic_S v1.20 (for beta20) by σ軸
+--information:XYZ追加回転@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@X:X,-720,720,0,0.01
 --track@Y:Y,-720,720,0,0.01
@@ -1297,7 +1347,7 @@ if angle ~= 0 or draw then
 end
 
 @任意軸追加回転
---information:任意軸追加回転@Basic_S v1.20 (for beta20) by σ軸
+--information:任意軸追加回転@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@angle:角度,-720,720,0,0.01
 --track0:回転軸X,-512,512,0,0.001
@@ -1543,7 +1593,7 @@ else
 end
 
 @傾斜
---information:傾斜@Basic_S v1.20 (for beta20) by σ軸
+--information:傾斜@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\変形
 --track@angle:角度,-80,80,0,0.001
 --track@slope:傾き%,-500,500,0,0.001
@@ -1621,7 +1671,7 @@ obj.copybuffer("object", "tempbuffer");
 obj.cx, obj.cy = obj.cx - cx, obj.cy - cy;
 
 @XY軸変形
---information:XY軸変形@Basic_S v1.20 (for beta20) by σ軸
+--information:XY軸変形@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\変形
 --value@axis_X:X軸,{100,0}
 --check@stretch_X:X長さ変更,false
@@ -1676,7 +1726,7 @@ obj.drawpoly(
 obj.copybuffer("object", "tempbuffer");
 
 @領域サイズ変更
---information:領域サイズ変更@Basic_S v1.20 (for beta20) by σ軸
+--information:領域サイズ変更@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上,-4000,4000,0,1
 --track@B:下,-4000,4000,0,1
@@ -1763,7 +1813,7 @@ end
 obj.cx, obj.cy = cx, cy;
 
 @領域割合サイズ変更
---information:領域割合サイズ変更@Basic_S v1.20 (for beta20) by σ軸
+--information:領域割合サイズ変更@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上%,-100,100,0,0.001
 --track@B:下%,-100,100,0,0.001
@@ -1817,7 +1867,7 @@ if L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @領域サイズ指定
---information:領域サイズ指定@Basic_S v1.20 (for beta20) by σ軸
+--information:領域サイズ指定@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -1911,7 +1961,7 @@ elseif L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @カットずらし
---information:カットずらし@Basic_S v1.20 (for beta20) by σ軸
+--information:カットずらし@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track0:ずれX,-4000,4000,40,1
 --track1:ずれY,-4000,4000,0,1
@@ -2120,7 +2170,7 @@ if not move_center then
 end
 
 @中抜きクリッピング
---information:中抜きクリッピング@Basic_S v1.20 (for beta20) by σ軸
+--information:中抜きクリッピング@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -2220,7 +2270,7 @@ else
 end
 
 @小数ぼかし
---information:小数ぼかし@Basic_S v1.20 (for beta20) by σ軸
+--information:小数ぼかし@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\ぼかし
 --track@range:範囲,0,1000,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2363,7 +2413,7 @@ if luma_weight > 0 then
 end
 
 @縁取りα
---information:縁取りα@Basic_S v1.20 (for beta20) by σ軸
+--information:縁取りα@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,1
 --track@blur:ぼかし,0,100,5,1
@@ -2540,7 +2590,7 @@ elseif alpha_front > 0 then
 end
 
 @四角縁取り
---information:四角縁取り@Basic_S v1.20 (for beta20) by σ軸
+--information:四角縁取り@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2782,7 +2832,7 @@ else
 end
 
 @内側シャドウ
---information:内側シャドウ@Basic_S v1.20 (for beta20) by σ軸
+--information:内側シャドウ@Basic_S v1.30 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@X:X,-1000,1000,-40,0.01
 --track@Y:Y,-1000,1000,24,0.01
@@ -2940,7 +2990,7 @@ obj.copybuffer("object", "tempbuffer");
 obj.pixelshader("identity", "object", cache_name, nil, "mask");
 
 @画像ファイル合成
---information:画像ファイル合成 v1.20 (for beta20) by σ軸
+--information:画像ファイル合成 v1.30 (for beta21) by σ軸
 --label:Basic_S\加工
 --file@file:画像ファイル
 --track0:X,-4000,4000,0,0.01
@@ -3206,7 +3256,7 @@ obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.sx, 
 obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
 
 @動画ファイル合成
---information:動画ファイル合成 v1.20 (for beta20) by σ軸
+--information:動画ファイル合成 v1.30 (for beta21) by σ軸
 --label:Basic_S\加工
 --file@file:動画ファイル
 --track@start:再生開始秒,0,3600,0,0.001

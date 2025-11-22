@@ -10,7 +10,7 @@
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta20` で動作確認済み．
+  - `beta21` で動作確認済み．
 
 ## 導入方法
 
@@ -379,6 +379,14 @@ AviUtl (無印) にあった「動画ファイル合成」と同等のことが�
 :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/コマ落ちランダム)
 
 ## 改版履歴
+
+- **v1.30 (for beta21)** (2025-11-23)
+
+  - 「色調補正」フィルタに色空間 `OKLCH` を追加．
+
+  - 「色調補正」フィルタで色空間「HSL(双円錐)」を選んでも「HSL(円柱)」として処理されていたのを修正．
+
+  - `beta21` での動作確認．
 
 - **v1.20 (for beta20)** (2025-11-22)
 
