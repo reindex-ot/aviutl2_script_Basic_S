@@ -310,7 +310,7 @@ AviUtl (無印) にあった「動画ファイル合成」と同等のことが�
 
 別レイヤーの座標や回転角度，拡大率や透明度を読み取って反映します．個別の項目ごとに影響度を % 単位で指定できます．
 
-TODO: video.
+https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/別レイヤー同期)
 
