@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @四隅丸め
---information:四隅丸め@Basic_S v1.30 (for beta21) by σ軸
+--information:四隅丸め@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track@radius:半径,0,2000,40,0.01
 --check@uniform:半径均一,true
@@ -279,7 +279,7 @@ obj.pixelshader("carve", "object", nil, {
 }, "mask");
 
 @背景角丸矩形
---information:背景角丸矩形@Basic_S v1.30 (for beta21) by σ軸
+--information:背景角丸矩形@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -580,7 +580,7 @@ end
 obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
 
 @背景楕円
---information:背景楕円@Basic_S v1.30 (for beta21) by σ軸
+--information:背景楕円@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -691,7 +691,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @背景菱形
---information:背景菱形@Basic_S v1.30 (for beta21) by σ軸
+--information:背景菱形@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
@@ -805,7 +805,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @透明度適用
---information:透明度適用@Basic_S v1.30 (for beta21) by σ軸
+--information:透明度適用@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\加工
 --track@alpha:透明度,-100,100,0,0.01
 --check@apply_former:累積分も適用,false
@@ -824,7 +824,7 @@ if apply_former then obj.alpha, alpha = 1, alpha * obj.alpha end
 if alpha ~= 1 then obj.pixelshader("const_alpha", "object", nil, { alpha }, "mask") end
 
 @透明度二値化
---information:透明度二値化@Basic_S v1.30 (for beta21) by σ軸
+--information:透明度二値化@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\加工
 --track@alpha:基準透明度,0,100,50,0.01
 --track@buffer:ぼかし幅,0,100,8,0.01
@@ -864,7 +864,7 @@ if alpha > 0 or buffer < 1 then
 end
 
 @色調補正
---information:色調補正@Basic_S v1.30 (for beta21) by σ軸
+--information:色調補正@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\色調整
 --track@add_light:明るさ,0,200,100,0.01
 --track@contrast:コントラスト,0,200,100,0.01
@@ -912,9 +912,9 @@ static const float3x3 m1_rgb = {
 	0.2119035, 0.6806995, 0.10739696,
 	0.08830246, 0.28171885, 0.6299787
 }, m1_rgb_i = {
-	4.0767417,-3.3077116,0.23096994,
-	-1.268438,2.6097574,-0.34131938,
-	-0.0041960864,-0.7034186,1.7076147
+	4.0767417, -3.3077116, 0.23096994,
+	-1.268438, 2.6097574, -0.34131938,
+	-0.0041960864, -0.7034186, 1.7076147
 };
 float3 to_lms_gamma(float3 c)
 {
@@ -1076,9 +1076,9 @@ if space < 5 then
 		1.9779984951, -2.4285922050,  0.4505937099;
 		0.0259040371,  0.7827717662, -0.8086757660;
 	}, {
-		0.99999999845052,0.39633779217377,0.21580375806076;
-		1.0000000088818,-0.10556134232366,-0.063854174771706;
-		1.0000000546724,-0.089484182094966,-1.2914855378641;
+		0.99999999845052, 0.39633779217377, 0.21580375806076;
+		1.0000000088818, -0.10556134232366, -0.063854174771706;
+		1.0000000546724, -0.089484182094966, -1.2914855378641;
 	}} or space == 2 and {{ -- BT.601.
 	-- (YUV <- RGB, RGB <- YUV)-pairs.
 		0.299, 0.587, 0.114;
@@ -1153,7 +1153,7 @@ else
 end
 
 @回転中心
---information:回転中心@Basic_S v1.30 (for beta21) by σ軸
+--information:回転中心@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@X:X,-4000,4000,0,0.01
 --track@Y:Y,-4000,4000,0,0.01
@@ -1163,7 +1163,7 @@ obj.cy = obj.cy + Y;
 obj.cz = obj.cz + Z;
 
 @回転中心アンカー指定
---information:回転中心アンカー指定@Basic_S v1.30 (for beta21) by σ軸
+--information:回転中心アンカー指定@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\配置
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
@@ -1211,7 +1211,7 @@ obj.ox,	obj.oy,	obj.oz = obj.ox + dx, obj.oy + dy, obj.oz + dz;
 obj.cx,obj.cy,obj.cz = cx, cy, cz;
 
 @上下左右揃え
---information:上下左右揃え@Basic_S v1.30 (for beta21) by σ軸
+--information:上下左右揃え@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@X:左右%,-100,100,0,0.001
 --track@Y:上下%,-100,100,0,0.001
@@ -1233,7 +1233,7 @@ if cx ~= obj.cx or cy ~= obj.cy then
 end
 
 @直角回転
---information:直角回転@Basic_S v1.30 (for beta21) by σ軸
+--information:直角回転@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\配置
 --select@rot:方向=0,なし=0,90°時計回り=1,180°反転=2,90°反時計回り=3,左右反転=4,上下反転=5,右上軸反転=6,左上軸反転=7
 --check@move_center:中心の位置を変更,false
@@ -1280,7 +1280,7 @@ obj.copybuffer("object", "tempbuffer");
 if not move_center then obj.cx, obj.cy = obj.cx + (cx - cx0), obj.cy + (cy - cy0) end
 
 @XYZ追加回転
---information:XYZ追加回転@Basic_S v1.30 (for beta21) by σ軸
+--information:XYZ追加回転@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@X:X,-720,720,0,0.01
 --track@Y:Y,-720,720,0,0.01
@@ -1347,7 +1347,7 @@ if angle ~= 0 or draw then
 end
 
 @任意軸追加回転
---information:任意軸追加回転@Basic_S v1.30 (for beta21) by σ軸
+--information:任意軸追加回転@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\配置
 --track@angle:角度,-720,720,0,0.01
 --track0:回転軸X,-512,512,0,0.001
@@ -1593,7 +1593,7 @@ else
 end
 
 @傾斜
---information:傾斜@Basic_S v1.30 (for beta21) by σ軸
+--information:傾斜@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\変形
 --track@angle:角度,-80,80,0,0.001
 --track@slope:傾き%,-500,500,0,0.001
@@ -1671,7 +1671,7 @@ obj.copybuffer("object", "tempbuffer");
 obj.cx, obj.cy = obj.cx - cx, obj.cy - cy;
 
 @XY軸変形
---information:XY軸変形@Basic_S v1.30 (for beta21) by σ軸
+--information:XY軸変形@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\変形
 --value@axis_X:X軸,{100,0}
 --check@stretch_X:X長さ変更,false
@@ -1726,7 +1726,7 @@ obj.drawpoly(
 obj.copybuffer("object", "tempbuffer");
 
 @領域サイズ変更
---information:領域サイズ変更@Basic_S v1.30 (for beta21) by σ軸
+--information:領域サイズ変更@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上,-4000,4000,0,1
 --track@B:下,-4000,4000,0,1
@@ -1813,7 +1813,7 @@ end
 obj.cx, obj.cy = cx, cy;
 
 @領域割合サイズ変更
---information:領域割合サイズ変更@Basic_S v1.30 (for beta21) by σ軸
+--information:領域割合サイズ変更@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上%,-100,100,0,0.001
 --track@B:下%,-100,100,0,0.001
@@ -1867,7 +1867,7 @@ if L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @領域サイズ指定
---information:領域サイズ指定@Basic_S v1.30 (for beta21) by σ軸
+--information:領域サイズ指定@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -1961,7 +1961,7 @@ elseif L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @カットずらし
---information:カットずらし@Basic_S v1.30 (for beta21) by σ軸
+--information:カットずらし@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track0:ずれX,-4000,4000,40,1
 --track1:ずれY,-4000,4000,0,1
@@ -2170,7 +2170,7 @@ if not move_center then
 end
 
 @中抜きクリッピング
---information:中抜きクリッピング@Basic_S v1.30 (for beta21) by σ軸
+--information:中抜きクリッピング@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
@@ -2270,7 +2270,7 @@ else
 end
 
 @小数ぼかし
---information:小数ぼかし@Basic_S v1.30 (for beta21) by σ軸
+--information:小数ぼかし@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\ぼかし
 --track@range:範囲,0,1000,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2413,7 +2413,7 @@ if luma_weight > 0 then
 end
 
 @縁取りα
---information:縁取りα@Basic_S v1.30 (for beta21) by σ軸
+--information:縁取りα@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,1
 --track@blur:ぼかし,0,100,5,1
@@ -2590,7 +2590,7 @@ elseif alpha_front > 0 then
 end
 
 @四角縁取り
---information:四角縁取り@Basic_S v1.30 (for beta21) by σ軸
+--information:四角縁取り@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
@@ -2832,7 +2832,7 @@ else
 end
 
 @内側シャドウ
---information:内側シャドウ@Basic_S v1.30 (for beta21) by σ軸
+--information:内側シャドウ@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\装飾
 --track@X:X,-1000,1000,-40,0.01
 --track@Y:Y,-1000,1000,24,0.01
@@ -2990,7 +2990,7 @@ obj.copybuffer("object", "tempbuffer");
 obj.pixelshader("identity", "object", cache_name, nil, "mask");
 
 @画像ファイル合成
---information:画像ファイル合成 v1.30 (for beta21) by σ軸
+--information:画像ファイル合成 v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\加工
 --file@file:画像ファイル
 --track0:X,-4000,4000,0,0.01
@@ -3256,7 +3256,7 @@ obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.sx, 
 obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
 
 @動画ファイル合成
---information:動画ファイル合成 v1.30 (for beta21) by σ軸
+--information:動画ファイル合成 v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\加工
 --file@file:動画ファイル
 --track@start:再生開始秒,0,3600,0,0.001
@@ -3537,3 +3537,117 @@ obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.sx, 
 
 -- adjust the center.
 obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
+
+@別レイヤー同期
+--information:別レイヤー同期 v1.40-test1 (for beta21) by σ軸
+--label:Basic_S\配置
+--select@index_base:レイヤー位置=1,絶対指定=0,相対指定=1
+--value@index:番号,-1
+--track@sync_ox:X同期%,-200,200,100,0.001
+--track@sync_oy:Y同期%,-200,200,100,0.001
+--track@sync_oz:Z同期%,-200,200,100,0.001
+--track@sync_cx:中心X同期%,-200,200,100,0.001
+--track@sync_cy:中心Y同期%,-200,200,100,0.001
+--track@sync_cz:中心Z同期%,-200,200,100,0.001
+--track@sync_rot:回転同期%,-200,200,100,0.001
+--track@sync_sx:拡大X同期%,-200,200,100,0.001
+--track@sync_sy:拡大Y同期%,-200,200,100,0.001
+--track@sync_sz:拡大Z同期%,-200,200,100,0.001
+--track@sync_alpha:透明度同期%,-200,200,100,0.001
+--value@PI:PI,{}
+local obj, math, tonumber = obj, math, tonumber;
+
+-- take parameters.
+--[==[
+	PI = {
+		index_base:	string?,
+		index:		number?,
+		sync_ox:	number?,
+		sync_oy:	number?,
+		sync_oz:	number?,
+		sync_cx:	number?,
+		sync_cy:	number?,
+		sync_cz:	number?,
+		sync_rot:	number?,
+		sync_sx:	number?,
+		sync_sy:	number?,
+		sync_sz:	number?,
+		sync_alpha:	number?,
+	}
+]==]
+if PI.index_base then
+	local name2num = {
+		["絶対指定"] = 0, ["相対指定"] = 1,
+	};
+	index_base = name2num[PI.index_base] or index_base;
+end
+index = tonumber(PI.index) or tonumber(index) or -1;
+sync_ox = tonumber(PI.sync_ox) or sync_ox;
+sync_oy = tonumber(PI.sync_oy) or sync_oy;
+sync_oz = tonumber(PI.sync_oz) or sync_oz;
+sync_cx = tonumber(PI.sync_cx) or sync_cx;
+sync_cy = tonumber(PI.sync_cy) or sync_cy;
+sync_cz = tonumber(PI.sync_cz) or sync_cz;
+sync_rot = tonumber(PI.sync_rot) or sync_rot;
+sync_sx = tonumber(PI.sync_sx) or sync_sx;
+sync_sy = tonumber(PI.sync_sy) or sync_sy;
+sync_sz = tonumber(PI.sync_sz) or sync_sz;
+sync_alpha = tonumber(PI.sync_alpha) or sync_alpha;
+
+-- normalize parameters.
+if index_base == 1 then index = obj.layer + index end
+if index == obj.layer or index <= 0 then return end -- invalid layer index.
+sync_ox = sync_ox / 100;
+sync_oy = sync_oy / 100;
+sync_oz = sync_oz / 100;
+sync_cx = sync_cx / 100;
+sync_cy = sync_cy / 100;
+sync_cz = sync_cz / 100;
+sync_sx = sync_sx / 100;
+sync_sy = sync_sy / 100;
+sync_sz = sync_sz / 100;
+sync_alpha = sync_alpha / 100;
+
+-- check if the layer exists.
+local gv, hdr = obj.getvalue, "layer"..index;
+if not gv(hdr) then return end -- no object on the layer.
+
+-- load the properties.
+if sync_ox ~= 0 then obj.ox = obj.ox + gv(hdr..".x") * sync_ox end
+if sync_oy ~= 0 then obj.oy = obj.oy + gv(hdr..".y") * sync_oy end
+if sync_oz ~= 0 then obj.oz = obj.oz + gv(hdr..".z") * sync_oz end
+if sync_cx ~= 0 or sync_cy ~= 0 or sync_cz ~= 0 then
+	local cx, cy, cz =
+		gv(hdr..".cx") * sync_cx,
+		gv(hdr..".cy") * sync_cy,
+		gv(hdr..".cz") * sync_cz;
+
+	local sx, sy, sz, rx, ry, rz =
+		obj.sx * obj.getvalue("sx"),
+		obj.sy * obj.getvalue("sy"),
+		obj.sz * obj.getvalue("sz"),
+		math.pi / 180 * (obj.rx + obj.getvalue("rx")),
+		math.pi / 180 * (obj.ry + obj.getvalue("ry")),
+		math.pi / 180 * (obj.rz + obj.getvalue("rz"));
+	local c_x, s_x, c_y, s_y, c_z, s_z =
+		math.cos(rx), -math.sin(rx), math.cos(ry), -math.sin(ry), math.cos(rz), -math.sin(rz);
+	cy, cz = c_x * cy - s_x * cz, s_x * cy + c_x * cz;
+	cz, cx = c_y * cz - s_y * cx, s_y * cz + c_y * cx;
+	cx, cy = c_z * cx - s_z * cy, s_z * cx + c_z * cy;
+	cx, cy, cz = cx / sx, cy / sy, cz / sz;
+	obj.cx, obj.cy, obj.cz = obj.cx + cx, obj.cy + cy, obj.cz + cz;
+end
+if sync_sx ~= 0 then obj.sx = obj.sx * gv(hdr..".sx") ^ sync_sx end
+if sync_sy ~= 0 then obj.sy = obj.sy * gv(hdr..".sy") ^ sync_sy end
+if sync_sz ~= 0 then obj.sz = obj.sz * gv(hdr..".sz") ^ sync_sz end
+if sync_alpha ~= 0 then
+	obj.alpha = math.min(math.max(
+		obj.alpha * gv(hdr..".alpha") ^ sync_alpha, 0), 1);
+end
+if sync_rot ~= 0 then
+	local rx, ry, rz = gv(hdr..".rx"), gv(hdr..".ry"), gv(hdr..".rz");
+	if rx ~= 0 or ry ~= 0 or rz ~= 0 then
+		obj.effect("XYZ追加回転@Basic_S", "PI",
+			([[X=%s,Y=%s,Z=%s,intensity=%s]]):format(rx, ry, rz, sync_rot));
+	end
+end
