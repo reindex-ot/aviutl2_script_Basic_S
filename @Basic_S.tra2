@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @等速移動(秒)
---information:等速移動(秒)@Basic_S v1.30 (for beta21) by σ軸
+--information:等速移動(秒)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S
 --twopoint
 --param:1
@@ -34,7 +34,7 @@ if T == 0 then T = 1 end
 return v0 + (v1 - v0) * t / T;
 
 @等速移動(フレーム)
---information:等速移動(フレーム)@Basic_S v1.30 (for beta21) by σ軸
+--information:等速移動(フレーム)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S
 --twopoint
 --param:60
@@ -46,7 +46,7 @@ if F == 0 then F = 1 end
 return v0 + (v1 - v0) * f / F;
 
 @コマ落ち反復(秒)
---information:コマ落ち反復(秒)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(秒)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:0.5
@@ -57,7 +57,7 @@ if T == 0 then T = 1 end
 return gp(((t / T) % 1) < 0.5 and 0 or 1);
 
 @コマ落ち反復(フレーム)
---information:コマ落ち反復(フレーム)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(フレーム)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:30
@@ -69,7 +69,7 @@ if F == 0 then F = 1 end
 return gp(((f / F) % 1) < 0.5 and 0 or 1);
 
 @コマ落ち反復(Hz)
---information:コマ落ち反復(Hz)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(Hz)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:2
@@ -79,7 +79,7 @@ if 1 / N < 0 then t, N = t - gp("time", 1) - 1 / gp("framerate"), -N end
 return gp(((t * N) % 1) < 0.5 and 0 or 1);
 
 @コマ落ち反復(BPM)
---information:コマ落ち反復(BPM)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(BPM)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:120
@@ -89,7 +89,7 @@ if 1 / N < 0 then t, N = t - gp("time", 1) - 1 / gp("framerate"), -N end
 return gp(((t * N / 60) % 1) < 0.5 and 0 or 1);
 
 @コマ落ちランダム(秒)
---information:コマ落ち反復(秒)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(秒)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:0.5
@@ -101,7 +101,7 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(t / T) + 1);
 
 @コマ落ちランダム(フレーム)
---information:コマ落ち反復(フレーム)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(フレーム)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:30
@@ -114,7 +114,7 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(f / F) + 1);
 
 @コマ落ちランダム(Hz)
---information:コマ落ち反復(Hz)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(Hz)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:2
@@ -125,7 +125,7 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(t * N) + 1);
 
 @コマ落ちランダム(BPM)
---information:コマ落ち反復(BPM)@Basic_S v1.30 (for beta21) by σ軸
+--information:コマ落ち反復(BPM)@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
 --param:120

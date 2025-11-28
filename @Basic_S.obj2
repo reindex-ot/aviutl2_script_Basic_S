@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @角丸矩形
---information:角丸矩形@Basic_S v1.30 (for beta21) by σ軸
+--information:角丸矩形@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
@@ -156,7 +156,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @楕円
---information:楕円@Basic_S v1.30 (for beta21) by σ軸
+--information:楕円@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
@@ -263,7 +263,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @菱形
---information:菱形@Basic_S v1.30 (for beta21) by σ軸
+--information:菱形@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
@@ -370,7 +370,7 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @スーパー楕円
---information:スーパー楕円@Basic_S v1.30 (for beta21) by σ軸
+--information:スーパー楕円@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S\図形
 --track@exponent:膨らみ,-300,300,-60,0.001
 --track@width:幅,0,4000,100,1
@@ -480,7 +480,7 @@ if not do_fill then
 end
 
 @別レイヤー
---information:別レイヤー@Basic_S v1.30 (for beta21) by σ軸
+--information:別レイヤー@Basic_S v1.40-test1 (for beta21) by σ軸
 --label:Basic_S
 --select@index_base:レイヤー位置=1,絶対指定=0,相対指定=1
 --value@index:番号,-1
@@ -542,13 +542,36 @@ if position then
 	obj.cz = gv(hdr..".cz");
 end
 if rotation then
-	obj.rx = gv(hdr..".rx");
-	obj.ry = gv(hdr..".ry");
-	obj.rz = gv(hdr..".rz");
+	local rx, ry, rz, sx, sy, sz =
+		gv(hdr..".rx"), gv(hdr..".ry"), gv(hdr..".rz"),
+		gv(hdr..".sx"), gv(hdr..".sy"), gv(hdr..".sz");
 
-	obj.sx = gv(hdr..".sx");
-	obj.sy = gv(hdr..".sy");
-	obj.sz = gv(hdr..".sz");
+	local my_cx, my_cy, my_cz, my_rx, my_ry, my_rz =
+		gv("cx"), gv("cy"), gv("cz"), gv("rx"), gv("ry"), gv("rz");
+
+	-- revert the object states first.
+	obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz =
+		obj.cx - my_cx, obj.cy - my_cy, obj.cz - my_cz,
+		rx - my_rx, ry - my_ry, rz - my_rz;
+
+	-- apply the reverted center.
+	rx, ry, rz = math.pi / 180 * rx, math.pi / 180 * ry, math.pi / 180 * rz;
+	local c_x, s_x, c_y, s_y, c_z, s_z =
+		math.cos(rx), -math.sin(rx), math.cos(ry), -math.sin(ry), math.cos(rz), -math.sin(rz);
+	my_cy, my_cz = c_x * my_cy - s_x * my_cz, s_x * my_cy + c_x * my_cz;
+	my_cz, my_cx = c_y * my_cz - s_y * my_cx, s_y * my_cz + c_y * my_cx;
+	my_cx, my_cy = c_z * my_cx - s_z * my_cy, s_z * my_cx + c_z * my_cy;
+	my_cx, my_cy, my_cz = my_cx / sx, my_cy / sy, my_cz / sz;
+	obj.cx, obj.cy, obj.cz = obj.cx + my_cx, obj.cy + my_cy, obj.cz + my_cz;
+
+	-- apply the scaling.
+	obj.sx, obj.sy, obj.sz = sx, sy, sz;
+
+	-- apply the reverted rotation.
+	if my_rx ~= 0 or my_ry ~= 0 or my_rz ~= 0 then
+		obj.effect("XYZ追加回転@Basic_S", "PI",
+			([[X=%s,Y=%s,Z=%s]]):format(my_rx, my_ry, my_rz));
+	end
 end
 if alpha then
 	obj.alpha = gv(hdr..".alpha");
