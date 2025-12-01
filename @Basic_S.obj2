@@ -23,24 +23,27 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @角丸矩形
---information:角丸矩形@Basic_S v1.40 (for beta21) by σ軸
+--information:角丸矩形@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
---track@align_x:水平揃え,-100,100,0,0.001
---track@align_y:垂直揃え,-100,100,0,0.001
 --track@line:ライン幅,0,4000,4000,0.01
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
 --track@radius:角半径,0,2000,40,0.01
+--select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--group:配置,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--group:丸角設定,false
 --check@uniform:半径均一,true
 --track@r_RT:右上半径,0,2000,40,0.01
 --track@r_RB:右下半径,0,2000,40,0.01
 --track@r_LB:左下半径,0,2000,40,0.01
 --track@aspect:丸角縦横比,-100,100,0,0.001
 --check@fixed_aspect:丸角縦横比固定,true
---select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@combine:
 Texture2D chm : register(t0);
@@ -156,17 +159,19 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @楕円
---information:楕円@Basic_S v1.40 (for beta21) by σ軸
+--information:楕円@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
---track@align_x:水平揃え,-100,100,0,0.001
---track@align_y:垂直揃え,-100,100,0,0.001
 --track@line:ライン幅,0,4000,4000,0.01
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
 --check@circle:真円,false
+--group:配置,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@combine:
 Texture2D chm : register(t0);
@@ -263,17 +268,19 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @菱形
---information:菱形@Basic_S v1.40 (for beta21) by σ軸
+--information:菱形@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\図形
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
---track@align_x:水平揃え,-100,100,0,0.001
---track@align_y:垂直揃え,-100,100,0,0.001
 --track@line:ライン幅,0,4000,4000,0.01
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
 --check@square:正方形,false
+--group:配置,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@combine:
 Texture2D chm : register(t0);
@@ -370,18 +377,20 @@ obj.pixelshader("combine", "object", { "object", "tempbuffer" }, {
 });
 
 @スーパー楕円
---information:スーパー楕円@Basic_S v1.40 (for beta21) by σ軸
+--information:スーパー楕円@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\図形
 --track@exponent:膨らみ,-300,300,-60,0.001
 --track@width:幅,0,4000,100,1
 --track@height:高さ,0,4000,100,1
---track@align_x:水平揃え,-100,100,0,0.001
---track@align_y:垂直揃え,-100,100,0,0.001
 --track@line:ライン幅,0,4000,4000,1
 --color@color:色,0xffffff
 --color@color_back:背景色,0xffffff
 --track@alpha_back:背景透明度,0,100,100,0.01
 --check@symmetric:縦横一致,false
+--group:配置,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@carve:
 cbuffer constant0 : register(b0) {
@@ -480,14 +489,16 @@ if not do_fill then
 end
 
 @別レイヤー
---information:別レイヤー@Basic_S v1.40 (for beta21) by σ軸
+--information:別レイヤー@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S
 --select@index_base:レイヤー位置=1,絶対指定=0,相対指定=1
 --value@index:番号,-1
+--group:復元項目,true
 --check@effect:フィルタ効果,true
 --check@position:位置の復元,false
 --check@rotation:回転拡大の復元,false
 --check@alpha:透明度の復元,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, tonumber, type = obj, tonumber, type;
 

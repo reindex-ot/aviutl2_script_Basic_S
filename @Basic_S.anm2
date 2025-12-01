@@ -23,16 +23,18 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @四隅丸め
---information:四隅丸め@Basic_S v1.40 (for beta21) by σ軸
+--information:四隅丸め@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\クリッピング
 --track@radius:半径,0,2000,40,0.01
+--select@shape:形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--group:丸角設定,false
 --check@uniform:半径均一,true
 --track@r_RT:右上半径,0,2000,40,0.01
 --track@r_RB:右下半径,0,2000,40,0.01
 --track@r_LB:左下半径,0,2000,40,0.01
 --track@aspect:縦横比,-100,100,0,0.001
 --check@fixed_aspect:縦横比固定,true
---select@shape:形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--group:その他,false
 --track@line:ライン幅,0,4000,4000,0.01
 --value@PI:PI,{}
 --[[pixelshader@carve:
@@ -279,27 +281,31 @@ obj.pixelshader("carve", "object", nil, {
 }, "mask");
 
 @背景角丸矩形
---information:背景角丸矩形@Basic_S v1.40 (for beta21) by σ軸
+--information:背景角丸矩形@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
 --select@clip:クリッピング=0,なし=0,あり=1,ライン内=2
 --track@line:ライン幅,-500,4000,4000,0.01
+--track@radius:角半径,0,2000,40,0.01
+--select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--group:色/パターン画像,false
 --color@color:色,0xc0c0c0
 --file@file_image:パターン画像
---track@alpha:透明度,0,100,0,0.01
 --color@color_back:背景色,0xc0c0c0
 --file@file_back:背景パターン画像
+--group:透明度,false
+--track@alpha:透明度,0,100,0,0.01
 --track@alpha_back:背景透明度,0,100,100,0.01
 --track@alpha_front:前景透明度,0,100,0,0.01
---track@radius:角半径,0,2000,40,0.01
+--group:丸角設定,false
 --check@uniform:半径均一,true
 --track@r_RT:右上半径,0,2000,40,0.01
 --track@r_RB:右下半径,0,2000,40,0.01
 --track@r_LB:左下半径,0,2000,40,0.01
 --track@aspect:丸角縦横比,-100,100,0,0.001
 --check@fixed_aspect:丸角縦横比固定,true
---select@shape:丸角形状=0,円=0,円(凹)=1,菱形=2,四角形(凹)=3,正8角形=4,正8角形(凹)=5,正8角形(凹斜)=6,正12角形=7,正12角形(凹)=8,正12角形(凹斜)=9,スパイク=10,スパイク(凹)=11
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@combine:
 Texture2D obj : register(t0);
@@ -580,21 +586,24 @@ end
 obj.cx, obj.cy = obj.cx + (L - R) / 2, obj.cy + (T - B) / 2;
 
 @背景楕円
---information:背景楕円@Basic_S v1.40 (for beta21) by σ軸
+--information:背景楕円@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
 --select@clip:クリッピング=0,なし=0,あり=1,ライン内=2
 --track@line:ライン幅,-500,4000,4000,0.01
---color@color:色,0xc0c0c0
---file@file_image:パターン画像
---track@alpha:透明度,0,100,0,0.01
---color@color_back:背景色,0xc0c0c0
---file@file_back:背景パターン画像
---track@alpha_back:背景透明度,0,100,100,0.01
---track@alpha_front:前景透明度,0,100,0,0.01
 --check@inclusive:包含,true
 --check@circle:真円,false
+--group:色/パターン画像,false
+--color@color:色,0xc0c0c0
+--file@file_image:パターン画像
+--color@color_back:背景色,0xc0c0c0
+--file@file_back:背景パターン画像
+--group:透明度,false
+--track@alpha:透明度,0,100,0,0.01
+--track@alpha_back:背景透明度,0,100,100,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -691,21 +700,24 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @背景菱形
---information:背景菱形@Basic_S v1.40 (for beta21) by σ軸
+--information:背景菱形@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\装飾
 --track@pad_X:余白X,-1000,1000,10,1
 --track@pad_Y:余白Y,-1000,1000,10,1
 --select@clip:クリッピング=0,なし=0,あり=1,ライン内=2
 --track@line:ライン幅,-500,4000,4000,0.01
---color@color:色,0xc0c0c0
---file@file_image:パターン画像
---track@alpha:透明度,0,100,0,0.01
---color@color_back:背景色,0xc0c0c0
---file@file_back:背景パターン画像
---track@alpha_back:背景透明度,0,100,100,0.01
---track@alpha_front:前景透明度,0,100,0,0.01
 --check@inclusive:包含,true
 --check@square:正方形,false
+--group:色/パターン画像,false
+--color@color:色,0xc0c0c0
+--file@file_image:パターン画像
+--color@color_back:背景色,0xc0c0c0
+--file@file_back:背景パターン画像
+--group:透明度,false
+--track@alpha:透明度,0,100,0,0.01
+--track@alpha_back:背景透明度,0,100,100,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -805,7 +817,7 @@ obj.effect("背景角丸矩形@Basic_S", "クリッピング", clip,
 		pad_L, pad_R, pad_T, pad_B, line_x, line_y, back_x, back_y));
 
 @透明度適用
---information:透明度適用@Basic_S v1.40 (for beta21) by σ軸
+--information:透明度適用@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\加工
 --track@alpha:透明度,-100,100,0,0.01
 --check@apply_former:累積分も適用,false
@@ -824,10 +836,11 @@ if apply_former then obj.alpha, alpha = 1, alpha * obj.alpha end
 if alpha ~= 1 then obj.pixelshader("const_alpha", "object", nil, { alpha }, "mask") end
 
 @透明度二値化
---information:透明度二値化@Basic_S v1.40 (for beta21) by σ軸
+--information:透明度二値化@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\加工
 --track@alpha:基準透明度,0,100,50,0.01
 --track@buffer:ぼかし幅,0,100,8,0.01
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@apply:
 Texture2D src : register(t0);
@@ -864,7 +877,7 @@ if alpha > 0 or buffer < 1 then
 end
 
 @色調補正
---information:色調補正@Basic_S v1.40 (for beta21) by σ軸
+--information:色調補正@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\色調整
 --track@add_light:明るさ,0,200,100,0.01
 --track@contrast:コントラスト,0,200,100,0.01
@@ -874,6 +887,7 @@ end
 --track@mul_sat:彩度,0,200,100,0.01
 --check@saturate:飽和する,false
 --select@space:色空間=5,XYZ(sRGB)=0,OKLCH=1,YUV(BT.601)=2,YUV(BT.709)=3,YUV(BT.2020)=4,HSV(円柱)=5,HSV(円錐)=6,HSL(円柱)=7,HSL(双円錐)=8
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@by_xyz:
 Texture2D src : register(t0);
@@ -1153,7 +1167,7 @@ else
 end
 
 @回転中心
---information:回転中心@Basic_S v1.40 (for beta21) by σ軸
+--information:回転中心@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --track@X:X,-4000,4000,0,0.01
 --track@Y:Y,-4000,4000,0,0.01
@@ -1163,11 +1177,12 @@ obj.cy = obj.cy + Y;
 obj.cz = obj.cz + Z;
 
 @回転中心アンカー指定
---information:回転中心アンカー指定@Basic_S v1.40 (for beta21) by σ軸
+--information:回転中心アンカー指定@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
 --track2:Z,-4000,4000,0,0.01
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber = obj, math, tonumber;
 
@@ -1211,13 +1226,14 @@ obj.ox,	obj.oy,	obj.oz = obj.ox + dx, obj.oy + dy, obj.oz + dz;
 obj.cx,obj.cy,obj.cz = cx, cy, cz;
 
 @上下左右揃え
---information:上下左右揃え@Basic_S v1.40 (for beta21) by σ軸
+--information:上下左右揃え@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --track@X:左右%,-100,100,0,0.001
 --track@Y:上下%,-100,100,0,0.001
+--check@fix_pos:描画位置を固定,false
+--group:縦横無効化,false
 --check@x_enabled:左右有効,true
 --check@y_enabled:上下有効,true
---check@fix_pos:描画位置を固定,false
 local obj=obj;
 local cx, cy = obj.cx, obj.cy;
 if x_enabled then
@@ -1233,7 +1249,7 @@ if cx ~= obj.cx or cy ~= obj.cy then
 end
 
 @直角回転
---information:直角回転@Basic_S v1.40 (for beta21) by σ軸
+--information:直角回転@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --select@rot:方向=0,なし=0,90°時計回り=1,180°反転=2,90°反時計回り=3,左右反転=4,上下反転=5,右上軸反転=6,左上軸反転=7
 --check@move_center:中心の位置を変更,false
@@ -1280,14 +1296,16 @@ obj.copybuffer("object", "tempbuffer");
 if not move_center then obj.cx, obj.cy = obj.cx + (cx - cx0), obj.cy + (cy - cy0) end
 
 @XYZ追加回転
---information:XYZ追加回転@Basic_S v1.40 (for beta21) by σ軸
+--information:XYZ追加回転@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --track@X:X,-720,720,0,0.01
 --track@Y:Y,-720,720,0,0.01
 --track@Z:Z,-720,720,0,0.01
 --track@intensity:回転量,-200,200,100,0.01
+--group:描画処理,false
 --check@draw:描画する,false
 --check@grouped:グループ制御,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1347,14 +1365,16 @@ if angle ~= 0 or draw then
 end
 
 @任意軸追加回転
---information:任意軸追加回転@Basic_S v1.40 (for beta21) by σ軸
+--information:任意軸追加回転@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --track@angle:角度,-720,720,0,0.01
 --track0:回転軸X,-512,512,0,0.001
 --track1:回転軸Y,-512,512,0,0.001
 --track2:回転軸Z,-512,512,128,0.001
+--group:描画処理,false
 --check@draw:描画する,false
 --check@grouped:グループ制御,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1593,11 +1613,12 @@ else
 end
 
 @傾斜
---information:傾斜@Basic_S v1.40 (for beta21) by σ軸
+--information:傾斜@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\変形
 --track@angle:角度,-80,80,0,0.001
 --track@slope:傾き%,-500,500,0,0.001
 --value@baseline:基準軸,{-100,0,100,0}
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber = obj, math, tonumber;
 
@@ -1671,12 +1692,13 @@ obj.copybuffer("object", "tempbuffer");
 obj.cx, obj.cy = obj.cx - cx, obj.cy - cy;
 
 @XY軸変形
---information:XY軸変形@Basic_S v1.40 (for beta21) by σ軸
+--information:XY軸変形@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\変形
 --value@axis_X:X軸,{100,0}
 --check@stretch_X:X長さ変更,false
 --value@axis_Y:Y軸,{0,-100}
 --check@stretch_Y:Y長さ変更,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1726,7 +1748,7 @@ obj.drawpoly(
 obj.copybuffer("object", "tempbuffer");
 
 @領域サイズ変更
---information:領域サイズ変更@Basic_S v1.40 (for beta21) by σ軸
+--information:領域サイズ変更@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上,-4000,4000,0,1
 --track@B:下,-4000,4000,0,1
@@ -1734,6 +1756,7 @@ obj.copybuffer("object", "tempbuffer");
 --track@R:右,-4000,4000,0,1
 --check@move_center:中心の位置を変更,false
 --check@fill_blank:塗りつぶし,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1813,7 +1836,7 @@ end
 obj.cx, obj.cy = cx, cy;
 
 @領域割合サイズ変更
---information:領域割合サイズ変更@Basic_S v1.40 (for beta21) by σ軸
+--information:領域割合サイズ変更@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\クリッピング
 --track@T:上%,-100,100,0,0.001
 --track@B:下%,-100,100,0,0.001
@@ -1821,6 +1844,7 @@ obj.cx, obj.cy = cx, cy;
 --track@R:右%,-100,100,0,0.001
 --check@move_center:中心の位置を変更,false
 --check@fill_blank:塗りつぶし,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -1867,18 +1891,21 @@ if L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @領域サイズ指定
---information:領域サイズ指定@Basic_S v1.40 (for beta21) by σ軸
+--information:領域サイズ指定@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
 --track@width:幅,1,4000,256,1
---track@align_x:水平揃え,-100,100,0,0.001
---check@x_enabled:幅指定有効,true
 --track@height:高さ,1,4000,256,1
---track@align_y:垂直揃え,-100,100,0,0.001
---check@y_enabled:高さ指定有効,true
 --check@move_center:中心の位置を変更,false
 --check@fill_blank:塗りつぶし,false
+--group:整列,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--group:縦横無効化,false
+--check@x_enabled:幅指定有効,true
+--check@y_enabled:高さ指定有効,true
+--group:その他,false
 --check@inverted_mask:反転マスク,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
@@ -1961,15 +1988,17 @@ elseif L ~= 0 or R ~= 0 or T ~= 0 or B ~= 0 then
 end
 
 @カットずらし
---information:カットずらし@Basic_S v1.40 (for beta21) by σ軸
+--information:カットずらし@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\クリッピング
 --track0:ずれX,-4000,4000,40,1
 --track1:ずれY,-4000,4000,0,1
 --value@crack:切り取り線,{0,-100,0,100}
 --track@crop:切り取り幅,-4000,4000,0,0.01
+--check@move_center:中心の位置を変更,false
+--group:余白/重複処理,false
 --select@mode_padding:余白処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
 --select@mode_overlap:重複処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
---check@move_center:中心の位置を変更,false
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@place:
 Texture2D src : register(t0);
@@ -2170,19 +2199,22 @@ if not move_center then
 end
 
 @中抜きクリッピング
---information:中抜きクリッピング@Basic_S v1.40 (for beta21) by σ軸
+--information:中抜きクリッピング@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\クリッピング
 --track0:X,-4000,4000,0,0.1
 --track1:Y,-4000,4000,0,0.1
 --track@width:幅,-4000,4000,0,1
---track@align_x:水平揃え,-100,100,0,0.001
 --track@gap_x:余白幅,-4000,4000,0,1
 --track@height:高さ,-4000,4000,0,1
---track@align_y:垂直揃え,-100,100,0,0.001
 --track@gap_y:余白高さ,-4000,4000,0,1
+--check@move_center:中心の位置を変更,false
+--group:整列,false
+--track@align_x:水平揃え,-100,100,0,0.001
+--track@align_y:垂直揃え,-100,100,0,0.001
+--group:余白/重複処理,false
 --select@mode_padding:余白処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
 --select@mode_overlap:重複処理=0,空白=0,半透明=1,補間=2,引き伸ばし=3
---check@move_center:中心の位置を変更,false
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber, type = obj, math, tonumber, type;
 
@@ -2270,12 +2302,13 @@ else
 end
 
 @小数ぼかし
---information:小数ぼかし@Basic_S v1.40 (for beta21) by σ軸
+--information:小数ぼかし@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\ぼかし
 --track@range:範囲,0,1000,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
 --track@luma_weight:光の強さ,0,60,0,0.1
 --check@fixed_size:サイズ固定,false
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@convol:
 Texture2D src : register(t0);
@@ -2413,16 +2446,18 @@ if luma_weight > 0 then
 end
 
 @縁取りα
---information:縁取りα@Basic_S v1.40 (for beta21) by σ軸
+--information:縁取りα@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,1
 --track@blur:ぼかし,0,100,5,1
---track@alpha:透明度,0,100,0,0.01
 --color@color:縁色,0xffffff
+--track@alpha:透明度,0,100,0,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--group:パターン画像,false
 --file@file_image:パターン画像
 --track0:画像X,-4000,4000,0,1
 --track1:画像Y,-4000,4000,0,1
---track@alpha_front:前景透明度,0,100,0,0.01
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@carve:
 Texture2D src : register(t0);
@@ -2590,17 +2625,19 @@ elseif alpha_front > 0 then
 end
 
 @四角縁取り
---information:四角縁取り@Basic_S v1.40 (for beta21) by σ軸
+--information:四角縁取り@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\装飾
 --track@size:サイズ,-500,500,5,0.01
 --track@aspect:縦横比,-100,100,0,0.001
 --track@blur:ぼかし,0,100,0,0.01
---track@alpha:透明度,0,100,0,0.01
 --color@color:縁色,0xffffff
+--track@alpha:透明度,0,100,0,0.01
+--track@alpha_front:前景透明度,0,100,0,0.01
+--group:パターン画像,false
 --file@file_image:パターン画像
 --track0:画像X,-4000,4000,0,1
 --track1:画像Y,-4000,4000,0,1
---track@alpha_front:前景透明度,0,100,0,0.01
+--group:その他,false
 --value@PI:PI,{}
 --[[computeshader@convol_h:
 RWTexture2D<half4> dst : register(u0);
@@ -2832,17 +2869,19 @@ else
 end
 
 @内側シャドウ
---information:内側シャドウ@Basic_S v1.40 (for beta21) by σ軸
+--information:内側シャドウ@Basic_S v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\装飾
 --track@X:X,-1000,1000,-40,0.01
 --track@Y:Y,-1000,1000,24,0.01
 --track@alpha:濃さ,0,100,40,0.01
 --track@blur:拡散,0,500,10,0.01
 --color@color:影色,0x000000
+--select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--group:パターン画像,false
 --file@file_image:パターン画像
 --track0:画像X,-4000,4000,0,1
 --track1:画像Y,-4000,4000,0,1
---select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@recol_img:
 Texture2D mask : register(t0);
@@ -2990,19 +3029,23 @@ obj.copybuffer("object", "tempbuffer");
 obj.pixelshader("identity", "object", cache_name, nil, "mask");
 
 @画像ファイル合成
---information:画像ファイル合成 v1.40 (for beta21) by σ軸
+--information:画像ファイル合成 v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\加工
 --file@file:画像ファイル
+--group:描画,true
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
 --track@zoom:拡大率,0,5000,100,0.001
 --track@rotate:回転,-720,720,0,0.01
 --track@alpha:透明度,0,100,0,0.01
---check@no_smooth:補間なし,false
 --check@fixed_size:サイズ固定,false
+--group:配置,false
+--check@no_smooth:補間なし,false
 --select@mode_tile:画像ループ=0,なし=0,横=1,縦=2,縦横=3
+--group:合成,false
 --select@mode_draw:モード=0,前方から合成=0,後方から合成=1,アルファ値を乗算=2,色情報を上書き=3,輝度をアルファ値として上書き=4,輝度をアルファ値として乗算=5
 --select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@tile:
 Texture2D src : register(t0);
@@ -3256,22 +3299,27 @@ obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.sx, 
 obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
 
 @動画ファイル合成
---information:動画ファイル合成 v1.40 (for beta21) by σ軸
+--information:動画ファイル合成 v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\加工
 --file@file:動画ファイル
+--group:再生設定,true
 --track@start:再生開始秒,0,3600,0,0.001
 --track@rate:再生速度,-2000,2000,100,0.001
 --check@loop:ループ再生,false
+--group:描画,true
 --track0:X,-4000,4000,0,0.01
 --track1:Y,-4000,4000,0,0.01
 --track@zoom:拡大率,0,5000,100,0.001
 --track@rotate:回転,-720,720,0,0.01
 --track@alpha:透明度,0,100,0,0.01
---check@no_smooth:補間なし,false
 --check@fixed_size:サイズ固定,false
+--group:配置,false
+--check@no_smooth:補間なし,false
 --select@mode_tile:画像ループ=0,なし=0,横=1,縦=2,縦横=3
+--group:合成,false
 --select@mode_draw:モード=0,前方から合成=0,後方から合成=1,アルファ値を乗算=2,色情報を上書き=3,輝度をアルファ値として上書き=4,輝度をアルファ値として乗算=5
 --select@blend:合成モード=0,通常=0,加算=1,減算=2,乗算=3,スクリーン=4,オーバーレイ=5,比較(明)=6,比較(暗)=7,輝度=8,色差=9,陰影=10,明暗=11,差分=12
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@tile:
 Texture2D src : register(t0);
@@ -3539,21 +3587,27 @@ obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz, obj.sx, 
 obj.cx, obj.cy = obj.cx + dcx, obj.cy + dcy;
 
 @別レイヤー同期
---information:別レイヤー同期 v1.40 (for beta21) by σ軸
+--information:別レイヤー同期 v1.50-test1 (for beta22) by σ軸
 --label:Basic_S\配置
 --select@index_base:レイヤー位置=1,絶対指定=0,相対指定=1
 --value@index:番号,-1
+--group:座標,true
 --track@sync_ox:X同期%,-200,200,100,0.001
 --track@sync_oy:Y同期%,-200,200,100,0.001
 --track@sync_oz:Z同期%,-200,200,100,0.001
+--group:回転中心,true
 --track@sync_cx:中心X同期%,-200,200,100,0.001
 --track@sync_cy:中心Y同期%,-200,200,100,0.001
 --track@sync_cz:中心Z同期%,-200,200,100,0.001
+--group:回転,true
 --track@sync_rot:回転同期%,-200,200,100,0.001
+--group:拡大率,true
 --track@sync_sx:拡大X同期%,-200,200,100,0.001
 --track@sync_sy:拡大Y同期%,-200,200,100,0.001
 --track@sync_sz:拡大Z同期%,-200,200,100,0.001
+--group:透明度,true
 --track@sync_alpha:透明度同期%,-200,200,100,0.001
+--group:その他,false
 --value@PI:PI,{}
 local obj, math, tonumber = obj, math, tonumber;
 
