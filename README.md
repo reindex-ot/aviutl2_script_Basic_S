@@ -296,7 +296,7 @@ AviUtl (無印) の「縁取り」と同様，角が四角になる縁取りで�
 
 ### 画像ファイル合成
 
-標準のフィルタ効果の「画像ファイル合成」や，AviUtl (無印) にあった「画像ファイル合成」と同等のことができます．標準のものや無印版の機能に加えて画像の回転やアルファ値の指定，オブジェクトの範囲からはみ出しての合成などもできます．
+標準のフィルタ効果の「画像合成」や，AviUtl (無印) にあった「画像ファイル合成」と同等のことができます．標準のものや無印版の機能に加えて画像の回転やアルファ値の指定，オブジェクトの範囲からはみ出しての合成などもできます．
 
 - 動画ファイルは読み込めません．[動画ファイル合成](#動画ファイル合成)を使用してください．
 
@@ -358,13 +358,13 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 - 1 周期の開始点はオブジェクト開始点が基準になります．
 - 「設定」に負数を指定すると，1 周期の開始点の基準がオブジェクトの終了点になります．
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/時間制御繰り返し) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/時間制御繰り返し)
 
 ### 全体で時間制御
 
 標準のトラックバー移動の「直線移動(時間制御)」と似ていますが，時間制御の縦方向の尺度が数値の変化量で重み付けされていないため，中間点の数値を動かしてもその数値になるタイミングがズレません．
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/全体で時間制御) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/全体で時間制御)
 
 ### 区間ごとに時間制御
 
@@ -372,7 +372,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 <img width="1000" height="480" alt="Demo of Interval-wise Time-Control" src="https://github.com/user-attachments/assets/eb4d50d8-f20d-4554-8f6a-f11b7383e059" />
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/区間ごとに時間制御) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/区間ごとに時間制御)
 
 ### 対数補間 / 対数補間(全体時間制御)
 
@@ -383,7 +383,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   - 無印のは中間点区間ごとに適用されます．
   - 「(全体時間制御)」のはオブジェクト全体の時間で適用されます．
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/対数補間) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/対数補間)
 
 ### 逆数補間 / 逆数補間(全体時間制御)
 
@@ -394,7 +394,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   - 無印のは中間点区間ごとに適用されます．
   - 「(全体時間制御)」のはオブジェクト全体の時間で適用されます．
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/逆数補間) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/逆数補間)
 
 ### バウンス / バウンス(全体時間制御)
 
@@ -406,7 +406,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   - 無印のは中間点区間ごとに適用されます．
   - 「(全体時間制御)」のはオブジェクト全体の時間で適用されます．
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/バウンス) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/バウンス)
 
 ### バック / バック(全体時間制御)
 
@@ -419,7 +419,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   - 「(全体時間制御)」のはオブジェクト全体の時間で適用されます．
 - 区間の左右の数値範囲を超えて変化するため，フィルタ効果などによっては数値が規定の範囲外になり，正しく表現されない可能性があるので注意．
 
-<!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/バック) -->
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/バック)
 
 ##  謝辞
 
