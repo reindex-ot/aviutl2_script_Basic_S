@@ -433,7 +433,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 ##  改版履歴
 
-- **v1.50 (for beta22)** (2025-12-??)
+- **v1.50 (for beta22)** (2025-12-01)
 
   - トラックバー移動スクリプトを 14 個追加．
 
