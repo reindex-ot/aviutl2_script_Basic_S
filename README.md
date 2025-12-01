@@ -370,7 +370,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 時間制御のグラフによる抑揚を，各中間点区間ごとに適用するトラックバー移動スクリプトです．
 
-TODO: sample image.
+<img width="1000" height="480" alt="Demo of Interval-wise Time-Control" src="https://github.com/user-attachments/assets/eb4d50d8-f20d-4554-8f6a-f11b7383e059" />
 
 <!-- :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/区間ごとに時間制御) -->
 
