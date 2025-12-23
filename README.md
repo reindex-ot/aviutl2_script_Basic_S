@@ -10,7 +10,7 @@
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta22` で動作確認済み．
+  - `beta25` で動作確認済み．
 
 ## 導入方法
 
@@ -318,6 +318,29 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 ##  追加されるトラックバー移動スクリプト
 
+### 全体で時間制御
+
+標準のトラックバー移動の「直線移動(時間制御)」と似ていますが，時間制御の縦方向の尺度が数値の変化量で重み付けされていないため，中間点の数値を動かしてもその数値になるタイミングがズレません．
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/全体で時間制御)
+
+### 区間ごとに時間制御
+
+時間制御のグラフによる抑揚を，各中間点区間ごとに適用するトラックバー移動スクリプトです．
+
+<img width="1000" height="480" alt="Demo of Interval-wise Time-Control" src="https://github.com/user-attachments/assets/eb4d50d8-f20d-4554-8f6a-f11b7383e059" />
+
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/区間ごとに時間制御)
+
+### 正弦波 / 2次式 / 3次式 / 4次式 / N次式 / 指数関数 / 円形
+
+標準的なイージング関数による緩急を加えるトラックバー移動スクリプトです．各中間点区間ごとにイージングが適用されます．
+
+- [「区間ごとに時間制御」](#区間ごとに時間制御)の特殊化版です．時間制御のグラフを調整すれば，近似的に同様の移動を実現できます．
+- 「加速」「減速」の設定で “ease-in” / “ease-out” / “ease-in/out” / “ease-out/in” の種類を切り替えられます．
+- 「N次式」と「指数関数」は「設定」の数値で調整できます．
+- 初期状態だと「Basic_S」 :arrow_right: 「基本緩急」以下に配置されています．
+
 ### 等速移動(秒) / 等速移動(フレーム)
 
 オブジェクト開始時は左の値，「設定」で指定した時間後に右の値になるように，直線移動します．
@@ -359,20 +382,6 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 - 「設定」に負数を指定すると，1 周期の開始点の基準がオブジェクトの終了点になります．
 
 :arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/時間制御繰り返し)
-
-### 全体で時間制御
-
-標準のトラックバー移動の「直線移動(時間制御)」と似ていますが，時間制御の縦方向の尺度が数値の変化量で重み付けされていないため，中間点の数値を動かしてもその数値になるタイミングがズレません．
-
-:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/全体で時間制御)
-
-### 区間ごとに時間制御
-
-時間制御のグラフによる抑揚を，各中間点区間ごとに適用するトラックバー移動スクリプトです．
-
-<img width="1000" height="480" alt="Demo of Interval-wise Time-Control" src="https://github.com/user-attachments/assets/eb4d50d8-f20d-4554-8f6a-f11b7383e059" />
-
-:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/区間ごとに時間制御)
 
 ### 対数補間 / 対数補間(全体時間制御)
 
@@ -432,6 +441,13 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   リズミカルイージングがなければこのスクリプトの発想もなかったかもしれませんし，スクリプト機能の要望も AviUtl2 の制作者であるＫＥＮくん様に届かなかったかもしれません．このような場で恐縮ですが，ことぶき様には感謝申し上げます．
 
 ##  改版履歴
+
+- **v1.60 (for beta25)** (2025-12-23)
+
+  - 「内側シャドウ」の「X」「Y」のパラメタが整数単位でしか影響していなかったのを修正．
+  - 一部フィルタ効果をフィルタオブジェクトとして使えるように設定．
+  - トラックバー移動スクリプトに「基本緩急」のスクリプトを 7 個追加．
+  - `beta25` での動作確認．
 
 - **v1.51 (for beta22)** (2025-12-01)
 
