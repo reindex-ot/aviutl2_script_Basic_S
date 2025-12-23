@@ -341,6 +341,8 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 - 「N次式」と「指数関数」は「設定」の数値で調整できます．
 - 初期状態だと「Basic_S」 :arrow_right: 「基本緩急」以下に配置されています．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/基本緩急)
+
 ### 等速移動(秒) / 等速移動(フレーム)
 
 オブジェクト開始時は左の値，「設定」で指定した時間後に右の値になるように，直線移動します．
