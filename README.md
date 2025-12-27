@@ -443,6 +443,8 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   - 「(全体時間制御)」のはオブジェクト全体の時間で適用されます．
 - 区間の左右の数値範囲を超えて変化するため，フィルタ効果などによっては数値が規定の範囲外になり，正しく表現されない可能性があるので注意．
 
+:arrow_right: [\[詳細\]](https://github.com/sigma-axis/aviutl2_script_Basic_S/wiki/バネ振動)
+
 ##  謝辞
 
 - ことぶき 様
