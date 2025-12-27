@@ -23,7 +23,7 @@ SOFTWARE.
 https://mit-license.org/
 ]]
 @全体で時間制御
---information:全体で時間制御@Basic_S v1.60 (for beta25) by σ軸
+--information:全体で時間制御@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --timecontrol
 local gp = obj.getpoint;
@@ -32,7 +32,7 @@ local v0, v1 = gp(i), gp(i + 1);
 return v0 + (v1 - v0) * t;
 
 @区間ごとに時間制御
---information:区間ごとに時間制御@Basic_S v1.60 (for beta25) by σ軸
+--information:区間ごとに時間制御@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --timecontrol
 local gp = obj.getpoint;
@@ -42,7 +42,7 @@ local v0, v1 = gp(i), gp(i + 1);
 return v0 + (v1 - v0) * t;
 
 @正弦波
---information:正弦波@Basic_S v1.60 (for beta25) by σ軸
+--information:正弦波@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
 local gp, math = obj.getpoint, math;
@@ -59,7 +59,7 @@ local rho = 1 - math.cos(math.pi / 2 * t);
 return v0 + (v1 - v0) * rho;
 
 @2次式
---information:2次式@Basic_S v1.60 (for beta25) by σ軸
+--information:2次式@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
 local gp, math = obj.getpoint, math;
@@ -76,7 +76,7 @@ local rho = t ^ 2;
 return v0 + (v1 - v0) * rho;
 
 @3次式
---information:3次式@Basic_S v1.60 (for beta25) by σ軸
+--information:3次式@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
 local gp, math = obj.getpoint, math;
@@ -93,7 +93,7 @@ local rho = t ^ 3;
 return v0 + (v1 - v0) * rho;
 
 @4次式
---information:4次式@Basic_S v1.60 (for beta25) by σ軸
+--information:4次式@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
 local gp, math = obj.getpoint, math;
@@ -110,10 +110,10 @@ local rho = t ^ 4;
 return v0 + (v1 - v0) * rho;
 
 @N次式
---information:N次式@Basic_S v1.60 (for beta25) by σ軸
+--information:N次式@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
---param: 5
+--param:次数N,5
 local gp, math = obj.getpoint, math;
 local i, t = math.modf(gp("index"));
 local v0, v1, sp0, sp1 = gp(i), gp(i + 1), gp("accelerate"), gp("decelerate");
@@ -129,10 +129,10 @@ local rho = (N > 0 or t > 0) and t ^ N or 0;
 return v0 + (v1 - v0) * rho;
 
 @指数関数
---information:指数関数@Basic_S v1.60 (for beta25) by σ軸
+--information:指数関数@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
---param: 2
+--param:減衰率,2
 local gp, math = obj.getpoint, math;
 local i, t = math.modf(gp("index"));
 local v0, v1, sp0, sp1 = gp(i), gp(i + 1), gp("accelerate"), gp("decelerate");
@@ -148,7 +148,7 @@ local rho = a > 0 and (math.exp(a * t) - 1) / (math.exp(a) - 1) or t;
 return v0 + (v1 - v0) * rho;
 
 @円形
---information:円形@Basic_S v1.60 (for beta25) by σ軸
+--information:円形@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\基本緩急
 --speed:0,1
 local gp, math = obj.getpoint, math;
@@ -165,10 +165,10 @@ local rho = 1 - (1 - t ^ 2) ^ 0.5;
 return v0 + (v1 - v0) * rho;
 
 @等速移動(秒)
---information:等速移動(秒)@Basic_S v1.60 (for beta25) by σ軸
+--information:等速移動(秒)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --twopoint
---param:1
+--param:単位時間(秒),1
 local gp = obj.getpoint;
 local t, T, v0, v1 = gp("time"), gp("param"), gp(0), gp(1);
 if 1 / T < 0 then t, T, v0, v1 = gp("time", 1) - t, -T, v1, v0 end
@@ -176,10 +176,10 @@ if T == 0 then T = 1 end
 return v0 + (v1 - v0) * t / T;
 
 @等速移動(フレーム)
---information:等速移動(フレーム)@Basic_S v1.60 (for beta25) by σ軸
+--information:等速移動(フレーム)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --twopoint
---param:60
+--param:単位時間(フレーム),60
 local gp = obj.getpoint;
 local fr = gp("framerate");
 local f, F, v0, v1 = fr * gp("time"), gp("param"), gp(0), gp(1);
@@ -188,10 +188,10 @@ if F == 0 then F = 1 end
 return v0 + (v1 - v0) * f / F;
 
 @コマ落ち反復(秒)
---information:コマ落ち反復(秒)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(秒)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:0.5
+--param:周期(秒),0.5
 local gp = obj.getpoint;
 local t, T = gp("time"), gp("param");
 if 1 / T < 0 then t, T = t - gp("time", 1) - 1 / gp("framerate"), -T end
@@ -199,10 +199,10 @@ if T == 0 then T = 1 end
 return gp(((t / T) % 1) < 0.5 and 0 or 1);
 
 @コマ落ち反復(フレーム)
---information:コマ落ち反復(フレーム)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(フレーム)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:30
+--param:周期(フレーム),30
 local gp = obj.getpoint;
 local fr = gp("framerate");
 local f, F = fr * gp("time"), gp("param");
@@ -211,30 +211,30 @@ if F == 0 then F = 1 end
 return gp(((f / F) % 1) < 0.5 and 0 or 1);
 
 @コマ落ち反復(Hz)
---information:コマ落ち反復(Hz)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(Hz)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:2
+--param:周期(Hz),2
 local gp = obj.getpoint;
 local t, N = gp("time"), gp("param");
 if 1 / N < 0 then t, N = t - gp("time", 1) - 1 / gp("framerate"), -N end
 return gp(((t * N) % 1) < 0.5 and 0 or 1);
 
 @コマ落ち反復(BPM)
---information:コマ落ち反復(BPM)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(BPM)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:120
+--param:周期(BPM),120
 local gp = obj.getpoint;
 local t, N = gp("time"), gp("param");
 if 1 / N < 0 then t, N = t - gp("time", 1) - 1 / gp("framerate"), -N end
 return gp(((t * N / 60) % 1) < 0.5 and 0 or 1);
 
 @コマ落ちランダム(秒)
---information:コマ落ち反復(秒)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(秒)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:0.5
+--param:周期(秒),0.5
 local gp = obj.getpoint;
 local t, T = gp("time"), gp("param");
 if 1 / T < 0 then t = t - gp("time", 1) - 1 / gp("framerate") end
@@ -243,10 +243,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(t / T) + 1);
 
 @コマ落ちランダム(フレーム)
---information:コマ落ち反復(フレーム)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(フレーム)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:30
+--param:周期(フレーム),30
 local gp = obj.getpoint;
 local fr = gp("framerate");
 local f, F = fr * gp("time"), gp("param");
@@ -256,10 +256,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(f / F) + 1);
 
 @コマ落ちランダム(Hz)
---information:コマ落ち反復(Hz)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(Hz)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:2
+--param:周期(Hz),2
 local gp = obj.getpoint;
 local t, N = gp("time"), gp("param");
 if 1 / N < 0 then t = t - gp("time", 1) - 1 / gp("framerate") end
@@ -267,10 +267,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(t * N) + 1);
 
 @コマ落ちランダム(BPM)
---information:コマ落ち反復(BPM)@Basic_S v1.60 (for beta25) by σ軸
+--information:コマ落ち反復(BPM)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\コマ落ち
 --twopoint
---param:120
+--param:周期(BPM),120
 local gp = obj.getpoint;
 local t, N = gp("time"), gp("param");
 if 1 / N < 0 then t = t - gp("time", 1) - 1 / gp("framerate") end
@@ -278,10 +278,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * rand1(2525, math.floor(t * N / 60) + 1);
 
 @時間制御繰り返し(秒)
---information:時間制御繰り返し(秒)@Basic_S v1.60 (for beta25) by σ軸
+--information:時間制御繰り返し(秒)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\繰り返し
 --twopoint
---param:0.5
+--param:周期(秒),0.5
 --timecontrol
 local gp = obj.getpoint;
 local T1 = gp("time", 1);
@@ -292,10 +292,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * gp("timecontrol", "value", ((t / T) % 1) * T1);
 
 @時間制御繰り返し(フレーム)
---information:時間制御繰り返し(フレーム)@Basic_S v1.60 (for beta25) by σ軸
+--information:時間制御繰り返し(フレーム)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\繰り返し
 --twopoint
---param:30
+--param:周期(フレーム),30
 --timecontrol
 local gp = obj.getpoint;
 local fr, T1 = gp("framerate"), gp("time", 1);
@@ -306,10 +306,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * gp("timecontrol", "value", ((f / F) % 1) * T1);
 
 @時間制御繰り返し(Hz)
---information:時間制御繰り返し(Hz)@Basic_S v1.60 (for beta25) by σ軸
+--information:時間制御繰り返し(Hz)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\繰り返し
 --twopoint
---param:2
+--param:周期(Hz),2
 --timecontrol
 local gp = obj.getpoint;
 local T1 = gp("time", 1);
@@ -319,10 +319,10 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * gp("timecontrol", "value", ((t * N) % 1) * T1);
 
 @時間制御繰り返し(BPM)
---information:時間制御繰り返し(BPM)@Basic_S v1.60 (for beta25) by σ軸
+--information:時間制御繰り返し(BPM)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\繰り返し
 --twopoint
---param:120
+--param:周期(BPM),120
 --timecontrol
 local gp = obj.getpoint;
 local T1 = gp("time", 1);
@@ -332,7 +332,7 @@ local v0, v1 = gp(0), gp(1);
 return v0 + (v1 - v0) * gp("timecontrol", "value", ((t * N / 60) % 1) * T1);
 
 @対数補間
---information:対数補間@Basic_S v1.60 (for beta25) by σ軸
+--information:対数補間@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\特殊補間
 --timecontrol
 local gp, math = obj.getpoint, math;
@@ -346,7 +346,7 @@ end
 return v0 * (v1 / v0) ^ t;
 
 @対数補間(全体時間制御)
---information:対数補間(全体時間制御)@Basic_S v1.60 (for beta25) by σ軸
+--information:対数補間(全体時間制御)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\特殊補間
 --timecontrol
 local gp, math = obj.getpoint, math;
@@ -359,7 +359,7 @@ end
 return v0 * (v1 / v0) ^ t;
 
 @逆数補間
---information:逆数補間@Basic_S v1.60 (for beta25) by σ軸
+--information:逆数補間@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\特殊補間
 --timecontrol
 local gp, math = obj.getpoint, math;
@@ -373,7 +373,7 @@ end
 return 1 / (1 / v0 + (1 / v1 - 1 / v0) * t);
 
 @逆数補間(全体時間制御)
---information:逆数補間(全体時間制御)@Basic_S v1.60 (for beta25) by σ軸
+--information:逆数補間(全体時間制御)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S\特殊補間
 --timecontrol
 local gp, math = obj.getpoint, math;
@@ -386,10 +386,10 @@ end
 return 1 / (1 / v0 + (1 / v1 - 1 / v0) * t);
 
 @バウンス
---information:バウンス@Basic_S v1.60 (for beta25) by σ軸
+--information:バウンス@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --speed:0,1
---param: 0.70710678
+--param:反発係数,0.70710678
 --timecontrol
 local gp, math = obj.getpoint, math;
 local i, t = math.modf(gp("index"));
@@ -411,10 +411,10 @@ local rho = 4 * tau * (scale - tau);
 return v0 + (v1 - v0) * rho;
 
 @バウンス(全体時間制御)
---information:バウンス(全体時間制御)@Basic_S v1.60 (for beta25) by σ軸
+--information:バウンス(全体時間制御)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --speed:0,1
---param: 0.70710678
+--param:反発係数,0.70710678
 --timecontrol
 local gp, math = obj.getpoint, math;
 local i, t = math.modf(gp("timecontrol", "index"));
@@ -435,10 +435,10 @@ local rho = 4 * tau * (scale - tau);
 return v0 + (v1 - v0) * rho;
 
 @バック
---information:バック@Basic_S v1.60 (for beta25) by σ軸
+--information:バック@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --speed:0,1
---param: 0.8
+--param:勢い,0.8
 --timecontrol
 local gp, math = obj.getpoint, math;
 local i, t = math.modf(gp("index"));
@@ -456,10 +456,10 @@ local rho = t ^ 3 - t * a * math.sin(math.pi * t);
 return v0 + (v1 - v0) * rho;
 
 @バック(全体時間制御)
---information:バック(全体時間制御)@Basic_S v1.60 (for beta25) by σ軸
+--information:バック(全体時間制御)@Basic_S v1.70 (for beta26) by σ軸
 --label:Basic_S
 --speed:0,1
---param: 0.8
+--param:勢い,0.8
 --timecontrol
 local gp, math = obj.getpoint, math;
 local i, t = math.modf(gp("timecontrol", "index"));
@@ -474,3 +474,51 @@ local a = math.max(gp("param"), 0);
 local rho = t ^ 3 - t * a * math.sin(math.pi * t);
 
 return v0 + (v1 - v0) * rho;
+
+@バネ振動
+--information:バネ振動@Basic_S v1.70 (for beta26) by σ軸
+--label:Basic_S
+--speed:0,1
+--param:振動回数,3
+--param:減衰率,0.3
+--timecontrol
+local gp, math = obj.getpoint, math;
+local i, t = math.modf(gp("index"));
+t = gp("timecontrol", "value", t * gp("time", gp("num") - 1));
+local v0, v1, sp0, sp1 = gp(i), gp(i + 1), gp("accelerate"), gp("decelerate");
+if sp0 == sp1 then
+	if t < 0.5 then t, v1, sp1 = 2 * t, (v0 + v1) / 2, not sp1;
+	else t, v0 = 2 * t - 1, (v0 + v1) / 2 end
+end
+if sp1 then v0, v1, t = v1, v0, 1 - t end
+
+local n, r = gp("param");
+n = math.max(n, 0);
+r = (r > 0 or t < 1) and (r ^ (1 - t) - r) / (1 - r) or 1;
+local rho = r * math.sin(2 * math.pi * ((n + 0.25) * (1 - t) + 0.25));
+
+return v0 + (v1 - v0) * rho;
+
+@バネ振動(全体時間制御)
+--information:バネ振動(全体時間制御)@Basic_S v1.70 (for beta26) by σ軸
+--label:Basic_S
+--speed:0,1
+--param:振動回数,3
+--param:減衰率,0.3
+--timecontrol
+local gp, math = obj.getpoint, math;
+local i, t = math.modf(gp("timecontrol", "index"));
+local v0, v1, sp0, sp1 = gp(i), gp(i + 1), gp("accelerate"), gp("decelerate");
+if sp0 == sp1 then
+	if t < 0.5 then t, v1, sp1 = 2 * t, (v0 + v1) / 2, not sp1;
+	else t, v0 = 2 * t - 1, (v0 + v1) / 2 end
+end
+if sp1 then v0, v1, t = v1, v0, 1 - t end
+
+local n, r = gp("param");
+n = math.max(n, 0);
+r = (r > 0 or t < 1) and (r ^ (1 - t) - r) / (1 - r) or 1;
+local rho = r * math.sin(2 * math.pi * ((n + 0.25) * (1 - t) + 0.25));
+
+return v0 + (v1 - v0) * rho;
+
