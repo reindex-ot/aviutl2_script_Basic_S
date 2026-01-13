@@ -35,7 +35,7 @@ To install English language for this script, copy the file `English.Basic_S.aul2
 
 - To find `Language` folder, click in the main menu “Others” :arrow_right: “Application Data” :arrow_right: “Language File Folder”.
 
-Usage documentations for this script in English is not available now.
+Usage documentations for this script in English are not available now.
 
 ##  詳しい解説について
 
