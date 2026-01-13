@@ -12,7 +12,7 @@
 
   - `beta26` で動作確認済み．
 
-## 導入方法
+##  導入方法
 
 `Basic_S.anm2`, `Basic_S.obj2`, `Basic_S.tra2` の 3 つのファイルに対して，以下のいずれかの操作をしてください．
 
@@ -26,6 +26,16 @@
 
 初期状態だと「オブジェクトを追加」や「フィルタ効果を追加」メニューの「Basic_S」以下に各種オブジェクトやフィルタ効果などが追加されています．
 - 「オブジェクト追加メニューの設定」や「トラックバー移動メニューの設定」の「ラベル」項目で分類を変更できます．
+
+### For English users
+
+This script contains an English translation file, which enables names and parameters of the scripts to be displayed in English.
+
+To install English language for this script, copy the file `English.Basic_S.aul2` to `Language` folder, then restart AviUtl2 and select `English` in the language setting menu.
+
+- To find `Language` folder, click in the main menu “Others” :arrow_right: “Application Data” :arrow_right: “Language File Folder”.
+
+Usage documentations for this script in English is not available now.
 
 ##  詳しい解説について
 
@@ -457,6 +467,11 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 ##  改版履歴
 
+- **v1.73 (for beta28a)** (2026-01-13)
+
+  - AviUtl2 の機能更新に合わせて，一部の処理を簡略化．
+  - 英語翻訳ファイルの追加．Added translation file for English.
+
 - **v1.72 (for beta26)** (2025-12-29)
 
   - トラックバー移動スクリプト「バウンス」にバウンド回数を指定する設定パラメタを追加．
@@ -538,7 +553,7 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 The MIT License (MIT)
 
-Copyright (C) 2025 sigma-axis
+Copyright (C) 2025-2026 sigma-axis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

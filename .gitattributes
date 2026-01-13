@@ -12,4 +12,5 @@
 *.scn2 text eol=lf linguist-language=Lua working-tree-encoding=utf8
 *.cam2 text eol=lf linguist-language=Lua working-tree-encoding=utf8
 *.tra2 text eol=lf linguist-language=Lua working-tree-encoding=utf8
+*.aul2 text eol=lf linguist-language=ini working-tree-encoding=utf8
 *.lua text eol=lf linguist-language=Lua working-tree-encoding=utf8
