@@ -27,15 +27,15 @@
 初期状態だと「オブジェクトを追加」や「フィルタ効果を追加」メニューの「Basic_S」以下に各種オブジェクトやフィルタ効果などが追加されています．
 - 「オブジェクト追加メニューの設定」や「トラックバー移動メニューの設定」の「ラベル」項目で分類を変更できます．
 
-### For English users
+### For English/Chinese users
 
-This script contains an English translation file, which enables names and parameters of the scripts to be displayed in English.
+This script contains English and Simplified Chinese translation files, which enable names and parameters of the scripts to be displayed in those langulages.
 
-To install English language for this script, copy the file `English.Basic_S.aul2` to `Language` folder, then restart AviUtl2 and select `English` in the language setting menu.
+To install languages for this script, copy the file `<language name>.Basic_S.aul2` to `Language` folder, then restart AviUtl2 and select that language in the language setting menu.
 
 - To find `Language` folder, click in the main menu “Others” :arrow_right: “Application Data” :arrow_right: “Language File Folder”.
 
-Usage documentations for this script in English are not available now.
+Usage documentations for this script in languages other than Japanese are not available now.
 
 ##  詳しい解説について
 
@@ -466,6 +466,10 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
   リズミカルイージングがなければこのスクリプトの発想もなかったかもしれませんし，スクリプト機能の要望も AviUtl2 の制作者であるＫＥＮくん様に届かなかったかもしれません．このような場で恐縮ですが，ことぶき様には感謝申し上げます．
 
 ##  改版履歴
+
+- **v1.74 (for beta28a)** (2026-01-14)
+
+  - 簡体字中国語翻訳ファイルの追加．Added translation file for Simplified Chinese. Thanks to @nsYW. (#1)
 
 - **v1.73 (for beta28a)** (2026-01-13)
 
