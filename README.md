@@ -467,6 +467,10 @@ https://github.com/user-attachments/assets/65a2eb86-3b2a-406d-829b-ccdbaa29f123
 
 ##  改版履歴
 
+- **v1.76 (for beta28a)** (2026-01-16)
+
+  - 簡体字中国語翻訳ファイルの更新．Updated the Simplified Chinese translation file. Thanks to @nsYW. (#3)
+
 - **v1.75 (for beta28a)** (2026-01-15)
 
   - 英語翻訳ファイルの翻訳漏れを修正．Fixed missing translations in the English translation file. (#2)
