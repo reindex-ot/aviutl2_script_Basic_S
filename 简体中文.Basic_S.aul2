@@ -567,3 +567,23 @@ N次式@Basic_S=N次方@Basic_S
 バネ振動(全体時間制御)@Basic_S=弹性振动(整体时间控制)@Basic_S
 振動回数=振动次数
 減衰率=衰减率
+
+
+################################
+# missing in v1.74 (for beta28a)
+#
+# [コマ落ちランダム(秒)@Basic_S]
+# コマ落ちランダム(秒)@Basic_S=Random Discrete (Second)@Basic_S
+# 周期(秒)=Period (Second)
+#
+# [コマ落ちランダム(フレーム)@Basic_S]
+# コマ落ちランダム(フレーム)@Basic_S=Random Discrete (Frame)@Basic_S
+# 周期(フレーム)=Period (Frame)
+#
+# [コマ落ちランダム(Hz)@Basic_S]
+# コマ落ちランダム(Hz)@Basic_S=Random Discrete (Hz)@Basic_S
+# 周期(Hz)=Period (Hz)
+#
+# [コマ落ちランダム(BPM)@Basic_S]
+# コマ落ちランダム(BPM)@Basic_S=Random Discrete (BPM)@Basic_S
+# 周期(BPM)=Period (BPM)

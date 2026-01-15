@@ -1,6 +1,6 @@
 ################################################################
 # English translation file for Basic_S script
-# Basic_S v1.74 (for beta 28a)
+# Basic_S v1.75 (for beta 28a)
 # https://github.com/sigma-axis/aviutl2_script_Basic_S
 
 ################################
@@ -73,6 +73,7 @@
 その他=Others
 
 [背景楕円@Basic_S]
+背景楕円@Basic_S=Back Ellipse@Basic_S
 余白X=Padding X
 余白Y=Padding Y
 クリッピング=Clipping
@@ -93,6 +94,7 @@
 その他=Others
 
 [背景菱形@Basic_S]
+背景菱形@Basic_S=Back Rhombus@Basic_S
 余白X=Padding X
 余白Y=Padding Y
 クリッピング=Clipping
@@ -582,6 +584,22 @@ N次式@Basic_S=Power Ease@Basic_S
 
 [コマ落ち反復(BPM)@Basic_S]
 コマ落ち反復(BPM)@Basic_S=Repeat Discrete (BPM)@Basic_S
+周期(BPM)=Period (BPM)
+
+[コマ落ちランダム(秒)@Basic_S]
+コマ落ちランダム(秒)@Basic_S=Random Discrete (Second)@Basic_S
+周期(秒)=Period (Second)
+
+[コマ落ちランダム(フレーム)@Basic_S]
+コマ落ちランダム(フレーム)@Basic_S=Random Discrete (Frame)@Basic_S
+周期(フレーム)=Period (Frame)
+
+[コマ落ちランダム(Hz)@Basic_S]
+コマ落ちランダム(Hz)@Basic_S=Random Discrete (Hz)@Basic_S
+周期(Hz)=Period (Hz)
+
+[コマ落ちランダム(BPM)@Basic_S]
+コマ落ちランダム(BPM)@Basic_S=Random Discrete (BPM)@Basic_S
 周期(BPM)=Period (BPM)
 
 [時間制御繰り返し(秒)@Basic_S]
