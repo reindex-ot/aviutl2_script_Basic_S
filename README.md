@@ -29,7 +29,7 @@
 
 ### For English/Chinese users
 
-This script contains English and Simplified Chinese translation files, which enable names and parameters of the scripts to be displayed in those langulages.
+This script contains English and Simplified Chinese translation files, which enable names and parameters of the scripts to be displayed in those languages.
 
 To install languages for this script, copy the file `<language name>.Basic_S.aul2` to `Language` folder, then restart AviUtl2 and select that language in the language setting menu.
 
